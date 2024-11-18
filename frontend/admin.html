@@ -1,0 +1,65 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Admin</div>
+        <ul class="nav-menu">
+            <li><a href="#librarians" class="nav-link active">Librarians</a></li>
+            <li><a href="index.html" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <section id="librarians" class="section active">
+            <h2>Librarian Management</h2>
+            <div class="librarian-controls">
+                <button class="btn btn-add" onclick="showAddLibrarianForm()">Add New Librarian</button>
+            </div>
+
+            <div class="librarian-list">
+                <!-- be populated by js -->
+            </div>
+
+            <!-- add librarian form -->
+            <div class="modal" id="addLibrarianModal">
+                <div class="modal-content">
+                    <h3>Add New Librarian</h3>
+                    <form id="addLibrarianForm">
+                        <input type="text" placeholder="First Name" required>
+                        <input type="text" placeholder="Last Name" required>
+                        <input type="email" placeholder="Email" required>
+                        <input type="date" placeholder="Hire Date" required>
+                        <!--button type="submit" class="btn">Add Librarian</button-->
+                        <button class="btn" onclick="showAddLibrarianForm()">Add New Librarian</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideAddLibrarianForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+            <div id="editLibrarianModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Librarian</h3>
+                    <form id="editLibrarianForm">
+                        <input type="hidden" id="editLibrarianId" name="id">
+                        <input type="text" id="editFirstName" name="firstName" placeholder="First Name" required>
+                        <input type="text" id="editLastName" name="lastName" placeholder="Last Name" required>
+                        <input type="email" id="editEmail" name="email" placeholder="Email" required>
+                        <input type="date" id="editHireDate" name="hireDate" placeholder="Hire Date" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditLibrarianForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

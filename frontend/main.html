@@ -1,0 +1,145 @@
+<!-- main.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Main Interface</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">Library Management System</div>
+        <ul class="nav-menu">
+            <li><a href="#books" class="nav-link active">Books</a></li>
+            <li><a href="#loans" class="nav-link">Loans</a></li>
+            <li><a href="#members" class="nav-link">Members</a></li>
+            <li><a href="index.html" class="nav-link">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <!-- books Section -->
+        <section id="books" class="section active">
+            <h2>Books</h2>
+            <div class="search-bar">
+                <input type="text" placeholder="Search books..." id="bookSearch">
+                <button class="btn" onclick="searchBooks()">Search</button>
+                <button class="btn btn-add" onclick="showAddBookForm()">Add New Book</button>
+            </div>
+            
+            <div class="book-list">
+                <!-- book will be populated by js -->
+            </div>
+
+            <!-- add book form -->
+            <div class="modal" id="addBookModal">
+                <div class="modal-content">
+                    <h3>Add New Book</h3>
+                    <form id="addBookForm">
+                        <input type="text" placeholder="Title" required>
+                        <input type="text" placeholder="Author Name" required>
+                        <input type="text" placeholder="Genre" required>
+                        <input type="date" placeholder="Publication Date" required>
+                        <input type="number" placeholder="Available Copies" required>
+                        <button type="submit" class="btn">Add Book</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideAddBookForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- edit form -->
+            <div id="editBookModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Book</h3>
+                    <form id="editBookForm">
+                        <input type="hidden" id="editBookId" name="id">
+                        <input type="text" id="editBookTitle" name="title" placeholder="Title" required>
+                        <input type="text" id="editBookAuthor" name="author" placeholder="Author" required>
+                        <input type="text" id="editBookGenre" name="genre" placeholder="Genre" required>
+                        <input type="date" id="editBookPublicationDate" name="publicationDate" placeholder="Publication Date" required>
+                        <input type="number" id="editBookAvailableCopies" name="availableCopies" placeholder="Available Copies" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditBookForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- loans section -->
+        <section id="loans" class="section">
+            <h2>Loans</h2>
+            <div class="loans-container">
+                <div class="current-loans">
+                    <h3>Current Loans</h3>
+                    <!-- loans list will be populated by js -->
+                </div>
+                <div class="new-loan">
+                    <h3>Create New Loan</h3>
+                    <form id="newLoanForm">
+                        <input type="text" placeholder="Member ID" required>
+                        <input type="text" placeholder="Book ID" required>
+                        <input type="date" placeholder="Loan Date" required>
+                        <input type="date" placeholder="Return Date" required>
+                        <button type="submit" class="btn">Create Loan</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- members section -->
+        <section id="members" class="section">
+            <h2>Members</h2>
+            <div class="search-bar">
+                <input type="text" placeholder="Search members..." id="memberSearch">
+                <button class="btn" onclick="searchMembers()">Search</button>
+                <button class="btn btn-add" onclick="showAddMemberForm()">Add New Member</button>
+            </div>
+
+            <div class="member-list">
+                <!-- member list will be populated by js -->
+            </div>
+
+            <!-- add member form -->
+            <div class="modal" id="addMemberModal">
+                <div class="modal-content">
+                    <h3>Add New Member</h3>
+                    <form id="addMemberForm">
+                        <input type="text" placeholder="First Name" required>
+                        <input type="text" placeholder="Last Name" required>
+                        <input type="email" placeholder="Email" required>
+                        <input type="tel" placeholder="Phone Number" required>
+                        <input type="date" placeholder="Membership Start Date" required>
+                        <button type="submit" class="btn">Add Member</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideAddMemberForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+            <!-- edit form -->
+            <div id="editMemberModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Member</h3>
+                    <form id="editMemberForm">
+                        <input type="hidden" id="editMemberId" name="id">
+                        <input type="text" id="editMemberFirstName" name="firstName" placeholder="First Name" required>
+                        <input type="text" id="editMemberLastName" name="lastName" placeholder="Last Name" required>
+                        <input type="email" id="editMemberEmail" name="email" placeholder="Email" required>
+                        <input type="tel" id="editMemberPhone" name="phone" placeholder="Phone" required>
+                        <input type="date" id="editMemberStartDate" name="startDate" placeholder="Start Date" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditMemberForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
