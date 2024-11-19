@@ -21,16 +21,18 @@ const pool = new Pool({
   port: process.env.PG_PORT,
 });
 
-// API route to fetch data
-app.get('/users', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM users');
-    res.json(result.rows); // Send rows as JSON to the frontend
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
-  }
-});
+// // API route to fetch data
+// app.get('/users', async (req, res) => {
+//   try {
+//     const result = await pool.query('SELECT * FROM users');
+//     res.json(result.rows); // Send rows as JSON to the frontend
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send('Server Error');
+//   }
+// });
+
+
 
 // Start the server
 app.listen(port, () => {
