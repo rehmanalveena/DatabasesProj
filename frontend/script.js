@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Search for a book by ID
-    async function searchBooks() {
-    const bookId = bookSearchInput.value.trim();
+  async function searchBooks() {
+    const bookId = bookSearch.value.trim();
     if (!bookId) {
       alert('Please enter a book ID to search.');
       return;
@@ -93,9 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --------------------------LIBRARIAN CRUD-------------------------------------------
-    // --------------------------LIBRARIAN CRUD-------------------------------------------
 const librariansList = document.getElementById('librarians-list'); // List of librarians
-const addLibrarianForm = document.getElementById('add-librarian-form'); // Form for adding librarians
+const addLibrarianForm = document.getElementById('addLibrarianForm'); // Form for adding librarians
 const editLibrarianForm = document.getElementById('edit-librarian-form'); // Form for editing librarians
 
 // Fetch librarians
