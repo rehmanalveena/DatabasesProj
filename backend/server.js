@@ -1,6 +1,7 @@
 const express = require('express');
 const { Pool } = require('pg'); // Import pg's Pool for database connection
 const cors = require('cors');  // Allow frontend-backend communication
+require('dotenv').config(); // Load environment variables from .env
 
 const app = express();
 const port = 3000;
@@ -9,10 +10,7 @@ const port = 3000;
 app.use(express.json());
 app.use(cors());
 
-
 // Database connection
-require('dotenv').config();
-
 const pool = new Pool({
   user: process.env.PG_USER,
   host: process.env.PG_HOST,
@@ -21,18 +19,28 @@ const pool = new Pool({
   port: process.env.PG_PORT,
 });
 
-// // API route to fetch data
-// app.get('/users', async (req, res) => {
-//   try {
-//     const result = await pool.query('SELECT * FROM users');
-//     res.json(result.rows); // Send rows as JSON to the frontend
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send('Server Error');
-//   }
-// });
+// Test the database connection
+pool.connect()
+  .then(() => {
+    console.log('Connected to the PostgreSQL database');
+  })
+  .catch(err => {
+    console.error('Database connection error:', err.stack);
+  });
 
+// Import routes
+const memberRoutes = require('./api/members');
+const bookRoutes = require('./api/books');
+const loanRoutes = require('./api/loans');
+const librarianRoutes = require('./api/librarians');
+const bookCopyRoutes = require('./api/book_copies');
 
+// Use routes
+app.use('/api/members', memberRoutes);
+app.use('/api/books', bookRoutes);
+app.use('/api/loans', loanRoutes);
+app.use('/api/librarians', librarianRoutes);
+app.use('/api/book_copies', bookCopyRoutes);
 
 // Start the server
 app.listen(port, () => {
