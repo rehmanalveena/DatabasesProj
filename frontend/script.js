@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Search for a book by ID
   async function searchBooks() {
-    const bookId = bookSearchInput.value.trim();
+    const bookId = bookSearch.value.trim();
     if (!bookId) {
       alert('Please enter a book ID to search.');
       return;
