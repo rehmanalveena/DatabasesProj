@@ -28,8 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFormHandlers();
     
     // load initial data
-    //loadMockData();
-    loadLibrarians();
+    loadMockData();
     updateDisplays();
 });
 
@@ -151,65 +150,23 @@ function loadLibrarians() {
 }
 
 
-// function handleAddLibrarian(event) {
-//     event.preventDefault();
-//     const formData = new FormData(event.target);
-//     const librarian = {
-//         id: Date.now(),
-//         firstName: formData.get('firstName'),
-//         lastName: formData.get('lastName'),
-//         email: formData.get('email'),
-//         hireDate: formData.get('hireDate')
-//     };
-    
-//     librarians.push(librarian);
-//     updateLibrarianDisplay();
-//     hideModal('addLibrarianModal');
-//     event.target.reset();
-// }
-// Function to handle adding a new librarian
 function handleAddLibrarian(event) {
     event.preventDefault();
-
-    // Get form data
     const formData = new FormData(event.target);
-    const newLibrarian = {
-        first_name: formData.get('first_name'),
-        last_name: formData.get('last_name'),
+    const librarian = {
+        id: Date.now(),
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
         email: formData.get('email'),
-        hire_date: formData.get('hire_date')
+        hireDate: formData.get('hireDate')
     };
-
-    // Simple validation (ensure all fields are filled)
-    if (!newLibrarian.first_name || !newLibrarian.last_name || !newLibrarian.email || !newLibrarian.hire_date) {
-        alert('Please fill in all fields.');
-        return;
-    }
-
-    fetch('/api/librarians', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newLibrarian)
-    })
-    .then(response => response.json())
-    .then(librarian => {
-        if (librarian) {
-            librarians.push(librarian); // Update the local list with the new librarian
-            updateLibrarianDisplay(); // Re-render the librarian list
-            hideModal('addLibrarianModal'); // Close modal
-            event.target.reset(); // Reset the form
-            alert('Librarian added successfully!'); // User feedback
-        } else {
-            alert('There was an issue adding the librarian.');
-        }
-    })
-    .catch(error => {
-        console.error('Error adding librarian:', error);
-        alert('Error adding librarian. Please try again.');
-    });
+    
+    librarians.push(librarian);
+    updateLibrarianDisplay();
+    hideModal('addLibrarianModal');
+    event.target.reset();
 }
+
 
 
 
@@ -247,60 +204,19 @@ function handleEditBook(event) {
 
 // edit forms
 
-// function editLibrarian(id) {
-//     const librarian = librarians.find(librarian => librarian.id === id);
-//     if (librarian) {
-//         document.getElementById('editLibrarianId').value = librarian.id;
-//         document.getElementById('editFirstName').value = librarian.firstName;
-//         document.getElementById('editLastName').value = librarian.lastName;
-//         document.getElementById('editEmail').value = librarian.email;
-//         document.getElementById('editHireDate').value = librarian.hireDate;
-//         showModal('editLibrarianModal');
-//     }
-// }
-// Function to handle editing a librarian
-function editLibrarian(librarian_id) {
-    const librarian = librarians.find(l => l.librarian_id === librarian_id);
-    
+function editLibrarian(id) {
+    const librarian = librarians.find(librarian => librarian.id === id);
     if (librarian) {
-        document.getElementById('editLibrarianId').value = librarian.librarian_id;
-        document.getElementById('editFirstName').value = librarian.first_name;
-        document.getElementById('editLastName').value = librarian.last_name;
+        document.getElementById('editLibrarianId').value = librarian.id;
+        document.getElementById('editFirstName').value = librarian.firstName;
+        document.getElementById('editLastName').value = librarian.lastName;
         document.getElementById('editEmail').value = librarian.email;
-        document.getElementById('editHireDate').value = librarian.hire_date;
+        document.getElementById('editHireDate').value = librarian.hireDate;
         showModal('editLibrarianModal');
     }
-
-    // Handle saving the edited librarian details
-    document.getElementById('editLibrarianForm').onsubmit = function (event) {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        const updatedLibrarian = {
-            id: formData.get('editLibrarianId'),
-            first_name: formData.get('editFirstName'),
-            last_name: formData.get('editLastName'),
-            email: formData.get('editEmail'),
-            hire_date: formData.get('editHireDate')
-        };
-
-        fetch(`/api/librarians/${updatedLibrarian.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedLibrarian)
-        })
-        .then(response => response.json())
-        .then(updated => {
-            const index = librarians.findIndex(l => l.librarian_id === updated.librarian_id);
-            librarians[index] = updated; // Update the local list with the edited librarian
-            updateLibrarianDisplay(); // Re-render the librarian list
-            hideModal('editLibrarianModal');
-        })
-        .catch(error => console.error('Error updating librarian:', error));
-    };
 }
+// Function to handle editing a librarian
+
 
 
 function editMember(id) {
@@ -415,56 +331,23 @@ function updateLoanDisplay() {
     `).join('');
 }
 
-// function updateLibrarianDisplay() {
-//     const librarianList = document.querySelector('.librarian-list');
-//     if (!librarianList) return;
-    
-//     librarianList.innerHTML = librarians.map(librarian => `
-//         <div class="list-item">
-//             <div>
-//                 <h3>${librarian.firstName} ${librarian.lastName}</h3>
-//                 <p>Email: ${librarian.email}</p>
-//                 <p>Hire Date: ${librarian.hireDate}</p>
-//             </div>
-//             <div>
-//                 <button class="btn" onclick="editLibrarian(${librarian.id})">Edit</button>
-//                 <button class="btn btn-cancel" onclick="deleteLibrarian(${librarian.id})">Delete</button>
-//             </div>
-//         </div>
-//     `).join('');
-// }
-// Function to display librarians on the page
 function updateLibrarianDisplay() {
-    // Get the element where the librarian list will be displayed
-    const librarianList = document.getElementById('librarianList');
+    const librarianList = document.querySelector('.librarian-list');
+    if (!librarianList) return;
     
-    // Clear the current list (so we don't duplicate entries)
-    librarianList.innerHTML = ''; 
-
-    // Loop through each librarian in the array and create list items
-    librarians.forEach(librarian => {
-        const li = document.createElement('li');
-        li.textContent = `${librarian.first_name} ${librarian.last_name}`; // Display librarian's full name
-        
-        // Edit button
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        // Assign a function that will call `editLibrarian()` when clicked, passing the librarian's ID
-        editButton.onclick = () => editLibrarian(librarian.id); // Make sure `librarian.id` matches the ID field returned by the backend
-
-        // Delete button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        // Assign a function that will call `deleteLibrarian()` when clicked, passing the librarian's ID
-        deleteButton.onclick = () => deleteLibrarian(librarian.id); // Again, ensure `librarian.id` is correct
-
-        // Append the buttons to the list item
-        li.appendChild(editButton);
-        li.appendChild(deleteButton);
-
-        // Append the list item to the list container
-        librarianList.appendChild(li);
-    });
+    librarianList.innerHTML = librarians.map(librarian => `
+        <div class="list-item">
+            <div>
+                <h3>${librarian.firstName} ${librarian.lastName}</h3>
+                <p>Email: ${librarian.email}</p>
+                <p>Hire Date: ${librarian.hireDate}</p>
+            </div>
+            <div>
+                <button class="btn" onclick="editLibrarian(${librarian.id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteLibrarian(${librarian.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 
@@ -567,24 +450,10 @@ function deleteMember(id) {
     }
 }
 
-// function deleteLibrarian(id) {
-//     if (confirm('Are you sure you want to delete this librarian?')) {
-//         librarians = librarians.filter(librarian => librarian.id !== id);
-//         updateLibrarianDisplay();
-//     }
-// }
-// Function to delete a librarian
 function deleteLibrarian(id) {
     if (confirm('Are you sure you want to delete this librarian?')) {
-        fetch(`/api/librarians/${id}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(() => {
-            librarians = librarians.filter(librarian => librarian.librarian_id !== id); // Remove from local list
-            updateLibrarianDisplay(); // Re-render the librarian list
-        })
-        .catch(error => console.error('Error deleting librarian:', error));
+        librarians = librarians.filter(librarian => librarian.id !== id);
+        updateLibrarianDisplay();
     }
 }
 
