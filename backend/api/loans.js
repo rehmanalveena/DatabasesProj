@@ -39,17 +39,37 @@ router.get('/:id', async (req, res) => {
 // Create new loan
 router.post('/', async (req, res) => {
   const { book_id, member_id, loan_date, return_date } = req.body;
+
   try {
-    const result = await pool.query(
+    // Check if the book has available copies
+    const book = await pool.query('SELECT Available_Copies FROM Book WHERE Book_ID = $1', [book_id]);
+    if (book.rows.length === 0) {
+      return res.status(404).json({ error: 'Book not found.' });
+    }
+
+    if (book.rows[0].available_copies <= 0) {
+      return res.status(400).json({ error: 'No copies available for this book.' });
+    }
+
+    // Create the loan with Loan_Date and Return_Date
+    const loan = await pool.query(
       'INSERT INTO Loan (Book_ID, Member_ID, Loan_Date, Return_Date) VALUES ($1, $2, $3, $4) RETURNING *',
-      [book_id, member_id, loan_date, return_date]
+      [book_id, member_id, loan_date || null, return_date || null]
     );
-    res.status(201).json(result.rows[0]);
+
+    // Decrement available copies
+    await pool.query(
+      'UPDATE Book SET Available_Copies = Available_Copies - 1 WHERE Book_ID = $1',
+      [book_id]
+    );
+
+    res.status(201).json(loan.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
+
 
 // Update loan
 router.put('/:id', async (req, res) => {
@@ -71,18 +91,33 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete loan
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
+router.delete('/:loan_id', async (req, res) => {
+  const { loan_id } = req.params;
+
   try {
-    const result = await pool.query('DELETE FROM Loan WHERE Loan_ID = $1 RETURNING *', [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Loan not found' });
+    // Find the book associated with the loan
+    const loan = await pool.query('SELECT Book_ID FROM Loan WHERE Loan_ID = $1', [loan_id]);
+    if (loan.rows.length === 0) {
+      return res.status(404).json({ error: 'Loan not found.' });
     }
-    res.json({ message: 'Loan deleted', loan: result.rows[0] });
+
+    const book_id = loan.rows[0].book_id;
+
+    // Delete the loan
+    await pool.query('DELETE FROM Loan WHERE Loan_ID = $1', [loan_id]);
+
+    // Increment available copies
+    await pool.query(
+      'UPDATE Book SET Available_Copies = Available_Copies + 1 WHERE Book_ID = $1',
+      [book_id]
+    );
+
+    res.status(200).json({ message: 'Loan deleted and book returned.' });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
+
 
 module.exports = router;

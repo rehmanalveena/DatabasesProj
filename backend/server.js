@@ -33,14 +33,12 @@ const memberRoutes = require('./api/members');
 const bookRoutes = require('./api/books');
 const loanRoutes = require('./api/loans');
 const librarianRoutes = require('./api/librarians');
-const bookCopyRoutes = require('./api/book_copies');
 
 // Use routes
 app.use('/api/members', memberRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/librarians', librarianRoutes);
-app.use('/api/book_copies', bookCopyRoutes);
 
 // Start the server
 app.listen(port, () => {
