@@ -22,43 +22,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // form submissions
     setupFormHandlers();
 
-    fetchBooks();  // Fetch books from the backend
+    // fetchBooks();  // Fetch books from the backend
     updateDisplays();
 
     // Add the searchBooks function to the global scope for use in HTML
     window.searchBooks = searchBooks;
 });
 
-// Fetch books from the backend API
+// BOOK -----------------------------------------------------
 async function fetchBooks() {
         try {
           const response = await fetch('http://localhost:3000/api/books');
           if (response.ok) {
-            const books = await response.json();
-            
-            // Clear the list before adding new books
-            booksList.innerHTML = '';
-            
-            // Iterate through the books and create list items for each
-            books.forEach(book => {
-              const listItem = document.createElement('li');
-              listItem.classList.add('book-item');
-              
-              // Format the publication year to a more readable format
-              const formattedDate = new Date(book.publication_year).toLocaleDateString();
-    
-              // Add the book details to the list item
-              listItem.innerHTML = `
-                <strong>Title:</strong> ${book.title} <br>
-                <strong>Author:</strong> ${book.author_name} <br>
-                <strong>Publication Year:</strong> ${formattedDate} <br>
-                <strong>Genre:</strong> ${book.genre} <br>
-                <strong>Available Copies:</strong> ${book.available_copies}
-              `;
-              
-              // Append the list item to the books list
-              booksList.appendChild(listItem);
-            });
+            booksList = await response.json();
+            updateBookDisplay();
           } else {
             console.error('Failed to fetch books:', response.statusText);
           }
@@ -79,27 +56,10 @@ async function searchBooks() {
       if (response.ok) {
         const book = await response.json();
 
-        // Clear the list before displaying the searched book
-        booksList.innerHTML = '';
-
-        // Format the publication year to a more readable format
-        const formattedDate = new Date(book.publication_year).toLocaleDateString();
-
-        // Create a list item for the book
-        const listItem = document.createElement('li');
-        listItem.classList.add('book-item');
-
-        // Add the book details to the list item
-        listItem.innerHTML = `
-          <strong>Title:</strong> ${book.title} <br>
-          <strong>Author:</strong> ${book.author_name} <br>
-          <strong>Publication Year:</strong> ${formattedDate} <br>
-          <strong>Genre:</strong> ${book.genre} <br>
-          <strong>Available Copies:</strong> ${book.available_copies}
-        `;
-
-        // Append the list item to the books list
-        booksList.appendChild(listItem);
+        booksList = [book];
+        
+        // Call updateBookDisplay to show only the searched book
+        updateBookDisplay();
       } else if (response.status === 404) {
         alert('Book not found.');
       } else {
@@ -136,7 +96,7 @@ async function addBook(event) {
             const newBook = await response.json();
             console.log('Book added successfully:', newBook);
             // Optionally refresh the book list
-            fetchBooks();
+            updateBookDisplay();
             hideAddBookForm();
         } else {
             console.error('Failed to add book:', response.statusText);
@@ -334,11 +294,10 @@ function updateDisplays() {
     updateLibrarianDisplay();
 }
 
-function updateBookDisplay(booksToShow = books) {
-    const bookList = document.querySelector('.book-list');
-    if (!bookList) return;
-    
-    bookList.innerHTML = booksToShow.map(book => `
+async function updateBookDisplay() {
+    const bookListElement = document.querySelector('.books-list');
+    if (!bookListElement) return;
+    bookListElement.innerHTML = booksList.map(book => `
         <div class="list-item">
             <div>
                 <h3>${book.title}</h3>
@@ -347,11 +306,38 @@ function updateBookDisplay(booksToShow = books) {
                 <p>Available Copies: ${book.available_copies}</p>
             </div>
             <div>
-                <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
-                <button class="btn btn-cancel" onclick="deleteBook(${book.book_id})">Delete</button>
+                <button class="btn" onclick="editBook(${book.id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteBook(${book.id})">Delete</button>
             </div>
         </div>
     `).join('');
+    // try {
+    //     const response = await fetch('http://localhost:3000/api/books');
+    //     if (!response.ok) {
+    //         console.error('Failed to fetch books:', response.statusText);
+    //         return;
+    //     }
+
+    //     const books = await response.json();
+
+    //     // Render the books to the DOM
+    //     bookList.innerHTML = books.map(book => `
+    //         <div class="list-item">
+    //             <div>
+    //                 <h3>${book.title}</h3>
+    //                 <p>Author: ${book.author_name}</p>
+    //                 <p>Genre: ${book.genre}</p>
+    //                 <p>Available Copies: ${book.available_copies}</p>
+    //             </div>
+    //             <div>
+    //                 <button class="btn" onclick="editBook(${book.id})">Edit</button>
+    //                 <button class="btn btn-cancel" onclick="deleteBook(${book.id})">Delete</button>
+    //             </div>
+    //         </div>
+    //     `).join('');
+    // } catch (error) {
+    //     console.error('Error fetching books:', error);
+    // }
 }
 
 function updateMemberDisplay(membersToShow = members) {
