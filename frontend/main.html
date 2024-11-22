@@ -110,11 +110,10 @@
                     <h3>Edit Loan</h3>
                     <form id="editLoanForm" onsubmit="handleEditLoan(event)">
                         <input type="hidden" id="editLoanId" name="id">
-                        <input type="text" id="editLoanFirstName" name="firstName" placeholder="First Name" required>
-                        <input type="text" id="editLoanLastName" name="lastName" placeholder="Last Name" required>
-                        <input type="email" id="editLoanEmail" name="email" placeholder="Email" required>
-                        <input type="tel" id="editLoanPhone" name="phone" placeholder="Phone" required>
-                        <input type="date" id="editLoanStartDate" name="startDate" placeholder="Start Date" required>
+                        <input type="text" id="editLoanMemberId" name="memberid" placeholder="Member Id" required>
+                        <input type="text" id="editLoanBookId" name="bookid" placeholder="Member Id" required>
+                        <input type="text" id="editLoanDate" name="loandate" placeholder="Loan Date" required>
+                        <input type="text" id="editReturnDate" name="returndate" placeholder="Return Date" required>
                         <div class="modal-buttons">
                             <button type="submit" class="btn">Save Changes</button>
                             <button type="button" class="btn btn-cancel" onclick="hideEditLoanForm()">Cancel</button>
