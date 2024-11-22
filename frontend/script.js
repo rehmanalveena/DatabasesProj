@@ -92,23 +92,26 @@ function updateMemberDisplay() {
 }
 
 function updateLoanDisplay() {
-    const librariansListElement = document.querySelector('.librarians-list');
-    if (!librariansListElement) return;
-    
-    librariansListElement.innerHTML = librariansList.map(librarian => `
+    const loansListElement = document.querySelector('.loans-list');
+    if (!loansListElement) return;
+
+    loansListElement.innerHTML = loansList.map(loan => `
         <div class="list-item">
             <div>
-                <h3>${librarian.first_name} ${librarian.last_name}</h3>
-                <p>Email: ${librarian.email}</p>
-                <p>Librarian ID: ${librarian.librarian_id}</p>
+                <p><strong>Loan ID:</strong> ${loan.loan_id}</p>
+                <p><strong>Book ID:</strong> ${loan.book_id}</p>
+                <p><strong>Member ID:</strong> ${loan.member_id}</p>
+                <p><strong>Loan Date:</strong> ${new Date(loan.loan_date).toLocaleDateString()}</p>
+                <p><strong>Return Date:</strong> ${new Date(loan.return_date).toLocaleDateString()}</p>
             </div>
             <div>
-                <button class="btn" onclick="editLibrarian(${librarian.librarian_id})">Edit</button>
-                <button class="btn btn-cancel" onclick="deleteLibrarian(${librarian.librarian_id})">Delete</button>
+                <button class="btn" onclick="editLoan(${loan.loan_id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteLoan(${loan.loan_id})">Delete</button>
             </div>
         </div>
     `).join('');
 }
+
 
 function updateLibrarianDisplay() {
     const librariansListElement = document.querySelector('.librarians-list');
@@ -639,7 +642,7 @@ async function fetchLoans() {
         const data = await response.json();
         loansList = Array.isArray(data) ? data : data.loans || [];
         
-        updateLibrarianDisplay();
+        updateLoanDisplay();
       } else {
         console.error('Failed to fetch loans:', response.statusText);
       }
