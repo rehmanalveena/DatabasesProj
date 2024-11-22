@@ -1,13 +1,13 @@
-// let booksList;
+booksList=[];
 // let membersList;
 
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
-    booksList = document.getElementById('books-list');
+    booksListElement = document.getElementById('books-list');
     //membersList = document.getElementById('members-list');
 
     console.log('DOMContentLoaded fired');
-    if (booksList) {
+    if (booksListElement) {
         console.log('booksList element found');
     } else {
         console.error('booksList element not found');
@@ -38,22 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // form submissions
     setupFormHandlers();
 
-    // fetchBooks();
-    // console.log("fetch books called");
-    // updateDisplays();
-    // console.log("updateDisplays called");
-
-    
-        console.log('Calling fetchBooks...');
-        fetchBooks();
-        console.log('fetchBooks completed.');
-
-        console.log('Calling updateDisplays...');
-        updateDisplays();
-        console.log('updateDisplays completed.');
- 
-
     fetchBooks();
+    console.log("fetch books called");
+    updateDisplays();
+    console.log("updateDisplays called");
 
     console.log("HELLO");
 
@@ -66,7 +54,8 @@ async function fetchBooks() {
         try {
           const response = await fetch('http://localhost:3000/api/books');
           if (response.ok) {
-            booksList = await response.json();
+            const data = await response.json();
+            booksList = Array.isArray(data) ? data : data.books || [];
             updateBookDisplay();
           } else {
             console.error('Failed to fetch books:', response.statusText);
@@ -104,7 +93,6 @@ async function searchBooks() {
 
         booksList = [book];
 
-        // Call updateBookDisplay to show only the searched book
         updateBookDisplay();
       } else if (response.status === 404) {
         alert('Book not found.');
@@ -142,7 +130,7 @@ async function addBook(event) {
             const newBook = await response.json();
             console.log('Book added successfully:', newBook);
             // Optionally refresh the book list
-            updateBookDisplay();
+            fetchBooks();
             hideAddBookForm();
         } else {
             console.error('Failed to add book:', response.statusText);
@@ -281,8 +269,6 @@ async function handleEditBook(event) {
         available_copies: parseInt(document.getElementById('editBookAvailableCopies').value, 10),
     };
 
-    //console.log(bookData);
-
     try {
         // Send data to the backend
         const response = await fetch(`http://localhost:3000/api/books/${bookId}`, {
@@ -294,8 +280,8 @@ async function handleEditBook(event) {
         });
 
         if (response.ok) {
-            const newBook = await response.json();
-            console.log('Book edited successfully:', newBook);
+            const updatedBook = await response.json();
+            console.log('Book edited successfully:', updatedBook);
             // Optionally refresh the book list
             fetchBooks();
             hideModal('editBookModal');
@@ -364,75 +350,26 @@ function updateDisplays() {
     // updateLibrarianDisplay();
 }
 
-// async function updateBookDisplay() {
-//     const bookListElement = document.querySelector('.books-list');
-//     if (!bookListElement) return;
-
-//     bookListElement.innerHTML = booksList.map(book => `
-//         <div class="list-item">
-//             <div>
-//                 <h3>${book.title}</h3>
-//                 <p>Author: ${book.author_name}</p>
-//                 <p>Genre: ${book.genre}</p>
-//                 <p>Available Copies: ${book.available_copies}</p>
-//                 <p>Book ID: ${book.book_id}</p>
-//             </div>
-//             <div>
-//                 <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
-//                 <button class="btn btn-cancel" onclick="deleteBook(${book.book_id})">Delete</button>
-//             </div>
-//         </div>
-//     `).join('');
-// }
-
 async function updateBookDisplay() {
     const bookListElement = document.querySelector('.books-list');
     if (!bookListElement) return;
 
-    // Clear existing content
-    bookListElement.innerHTML = '';
-
-    // Iterate over booksList and create DOM elements
-    booksList.forEach(book => {
-        // Create a container div for each book
-        const listItem = document.createElement('div');
-        listItem.className = 'list-item';
-
-        // Create inner content
-        const bookInfo = document.createElement('div');
-        bookInfo.innerHTML = `
-            <h3>${book.title}</h3>
-            <p>Author: ${book.author_name}</p>
-            <p>Genre: ${book.genre}</p>
-            <p>Available Copies: ${book.available_copies}</p>
-            <p>Book ID: ${book.book_id}</p>
-        `;
-
-        // Create buttons container
-        const buttonsContainer = document.createElement('div');
-        const editButton = document.createElement('button');
-        editButton.className = 'btn';
-        editButton.textContent = 'Edit';
-        editButton.onclick = () => editBook(book.book_id);
-
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'btn btn-cancel';
-        deleteButton.textContent = 'Delete';
-        deleteButton.onclick = () => deleteBook(book.book_id);
-
-        // Append buttons to buttons container
-        buttonsContainer.appendChild(editButton);
-        buttonsContainer.appendChild(deleteButton);
-
-        // Append book info and buttons to list item
-        listItem.appendChild(bookInfo);
-        listItem.appendChild(buttonsContainer);
-
-        // Append list item to the main book list
-        bookListElement.appendChild(listItem);
-    });
+    bookListElement.innerHTML = booksList.map(book => `
+        <div class="list-item">
+            <div>
+                <h3>${book.title}</h3>
+                <p>Author: ${book.author_name}</p>
+                <p>Genre: ${book.genre}</p>
+                <p>Available Copies: ${book.available_copies}</p>
+                <p>Book ID: ${book.book_id}</p>
+            </div>
+            <div>
+                <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteBook(${book.book_id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
 }
-
 
 function updateMemberDisplay() {
     const memberListElement = document.querySelector('.member-list');
