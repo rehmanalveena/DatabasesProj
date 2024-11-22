@@ -78,30 +78,47 @@
 
         <!-- LOANS -->
         <section id="loans" class="section">
-            <h2>Members</h2>
+            <h2>Loans</h2>
             <div class="search-bar">
-                <input type="text" placeholder="Search members by ID..." id="memberSearch">
-                <button class="btn" onclick="searchMembers()">Search</button>
-                <button class="btn btn-add" onclick="showAddMemberForm()">Add New Member</button>
+                <input type="text" placeholder="Search loans by ID..." id="loanSearch">
+                <button class="btn" onclick="searchLoans()">Search</button>
+                <button class="btn btn-add" onclick="showAddLoanForm()">Add New Loan</button>
             </div>
 
-            <ul id="member-list"></ul>
-            <div class="member-list">
-                <!-- The list of members will be populated here by JavaScript -->
+            <ul id="loans-list"></ul>
+            <div class="loans-list">
+                <!-- The list of loans will be populated here by JavaScript -->
             </div>
 
-            <!-- Add Loan Modal -->
-            <div class="modal" id="addMemberModal">
+            <!-- Add/Edit loan Modal -->
+            <div class="modal" id="addLoanModal">
                 <div class="modal-content">
                     <h3>Add Loan</h3>
                     <form id="addLoanForm">
-                        <input type="text" id="firstName" placeholder="First Name" required>
-                        <input type="text" id="lastName" placeholder="Last Name" required>
-                        <input type="email" id="email" placeholder="Email" required>
-                        <input type="tel" id="phone" placeholder="Phone" required>
-                        <input type="date" id="startDate" required>
+                        <input type="text" id="bookId" placeholder="Book ID" required>
+                        <input type="text" id="memberId" placeholder="Member ID" required>
+                        <input type="date" id="loanDate" required>
+                        <input type="date" id="returnDate" required>
                         <button type="submit" class="btn">Save</button>
-                        <button type="button" class="btn btn-cancel" onclick="hideAddMemberForm()">Cancel</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideAddLoanForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+            <!-- edit form -->
+            <div id="editLoanModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Loan</h3>
+                    <form id="editLoanForm" onsubmit="handleEditLoan(event)">
+                        <input type="hidden" id="editLoanId" name="id">
+                        <input type="text" id="editLoanFirstName" name="firstName" placeholder="First Name" required>
+                        <input type="text" id="editLoanLastName" name="lastName" placeholder="Last Name" required>
+                        <input type="email" id="editLoanEmail" name="email" placeholder="Email" required>
+                        <input type="tel" id="editLoanPhone" name="phone" placeholder="Phone" required>
+                        <input type="date" id="editLoanStartDate" name="startDate" placeholder="Start Date" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditLoanForm()">Cancel</button>
+                        </div>
                     </form>
                 </div>
             </div>

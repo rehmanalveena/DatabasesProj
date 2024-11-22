@@ -712,82 +712,83 @@ async function addLoan(event) {
 }
 
 async function deleteLoan(id) {
-    if (confirm('Are you sure you want to delete this librarian?')) {
+    if (confirm('Are you sure you want to delete this loan?')) {
         try {
             // Send DELETE request to the backend API
-            const response = await fetch(`http://localhost:3000/api/librarians/${id}`, {
+            const response = await fetch(`http://localhost:3000/api/loans/${id}`, {
                 method: 'DELETE',
             });
 
             if (response.ok) {
                 // Remove the book from the local `booksList`
-                librariansList = librariansList.filter(librarian => librarian.id !== id);
+                loansList = loansList.filter(loan => loan.id !== id);
 
                 // Update the display after deletion
-                fetchLibrarians();
+                fetchLoans();
 
-                alert('librarian successfully deleted.');
+                alert('loan successfully deleted.');
             } else if (response.status === 404) {
-                alert('librarian not found.');
+                alert('loan not found.');
             } else {
-                console.error('Failed to delete librarian:', response.statusText);
-                alert('An error occurred while deleting the librarian.');
+                console.error('Failed to delete loan:', response.statusText);
+                alert('An error occurred while deleting the loan.');
             }
         } catch (error) {
-            console.error('Error deleting librarian:', error);
-            alert('Could not delete the librarian. Please try again.');
+            console.error('Error deleting loan:', error);
+            alert('Could not delete the loan. Please try again.');
         }
     }
 }
 
 async function handleEditLoan(event) {
     event.preventDefault(); // Prevent the default form submission behavior
-    const librarianId = document.getElementById('editLibrarianId').value;
+    const loanId = document.getElementById('editLoanId').value;
 
     // Gather form data
-    const librarianData = {
-        first_name: document.getElementById('editLibrarianFirstName').value,
-        last_name: document.getElementById('editLibrarianLastName').value,
-        email: document.getElementById('editLibrarianEmail').value,
-        hire_date: document.getElementById('editLibrarianHireDate').value
+    const loanData = {
+        loan_id: document.getElementById('editLoanId').value = loan.loan_id,
+        member_id: document.getElementById('editLoanMemberId').value = loan.member_id,
+        book_id: document.getElementById('editLoanBookId').value = loan.book_id,
+        loan_date: document.getElementById('editLoanDate').value = loan.loan_date,
+        return_date: document.getElementById('editLoanReturnDate').value = loan.return_date
     };
 
     try {
         // Send data to the backend
-        const response = await fetch(`http://localhost:3000/api/librarians/${librarianId}`, {
+        const response = await fetch(`http://localhost:3000/api/loans/${loanId}`, {
             method: 'PUT', 
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(librarianData),
+            body: JSON.stringify(loanData),
         });
 
         if (response.ok) {
-            const updatedLibrarian = await response.json();
-            console.log('Librarian edited successfully:', updatedLibrarian);
+            const updatedLoan = await response.json();
+            console.log('Loan edited successfully:', updatedLoan);
             // Optionally refresh the librarian list
-            fetchLibrarians();
-            hideModal('editLibrarianModal');
+            fetchLoans();
+            hideModal('editLoanModal');
         } else {
-            console.error('Failed to edit librarian:', librarianId);
-            alert('Failed to edit librarian. Please try again.');
+            console.error('Failed to edit loan:', loanId);
+            alert('Failed to edit loan. Please try again.');
         }
     } catch (error) {
-        console.error('Error editing librarian:', error);
-        alert('An error occurred while editing the librarian. Please try again.');
+        console.error('Error editing loan:', error);
+        alert('An error occurred while editing the loan. Please try again.');
     }
 }
 
 function editLoan(id) {
     console.log("id is ", id);
-    const librarian = librariansList.find(librarian => librarian.librarian_id === id);
-    if (librarian) {
-        document.getElementById('editLibrarianId').value = librarian.librarian_id;
-        document.getElementById('editLibrarianFirstName').value = librarian.first_name;
-        document.getElementById('editLibrarianLastName').value = librarian.last_name;
-        document.getElementById('editLibrarianEmail').value = librarian.email;
-        document.getElementById('editLibrarianHireDate').value = librarian.hire_date;
-        showModal('editLibrarianModal');
+    const loan = loansList.find(loan => loan.loan_id === id);
+    if (loan) {
+        document.getElementById('editLoanId').value = loan.loan_id;
+        document.getElementById('editLoanMemberId').value = loan.member_id;
+        document.getElementById('editLoanBookId').value = loan.book_id;
+        document.getElementById('editLoanDate').value = loan.loan_date;
+        document.getElementById('editLoanReturnDate').value = loan.return_date;
+        showModal('editLoanModal');
     }
 }
 
