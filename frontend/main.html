@@ -76,25 +76,56 @@
             </div>
         </section>
 
+        <!-- LOANS -->
         <section id="loans" class="section">
-            <h2>Loans</h2>
-            <div class="loans-container">
-                <div class="current-loans">
-                    <h3>Current Loans</h3>
+            <h2>Members</h2>
+            <div class="search-bar">
+                <input type="text" placeholder="Search members by ID..." id="memberSearch">
+                <button class="btn" onclick="searchMembers()">Search</button>
+                <button class="btn btn-add" onclick="showAddMemberForm()">Add New Member</button>
+            </div>
+
+            <ul id="member-list"></ul>
+            <div class="member-list">
+                <!-- The list of members will be populated here by JavaScript -->
+            </div>
+
+            <!-- Add/Edit Member Modal -->
+            <div class="modal" id="addMemberModal">
+                <div class="modal-content">
+                    <h3>Add/Edit Member</h3>
+                    <form id="addMemberForm">
+                        <input type="text" id="firstName" placeholder="First Name" required>
+                        <input type="text" id="lastName" placeholder="Last Name" required>
+                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="tel" id="phone" placeholder="Phone" required>
+                        <input type="date" id="startDate" required>
+                        <button type="submit" class="btn">Save</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideAddMemberForm()">Cancel</button>
+                    </form>
                 </div>
-                <div class="new-loan">
-                    <h3>Create New Loan</h3>
-                    <form id="newLoanForm">
-                        <input type="text" id="MemberID" placeholder="Member ID" required>
-                        <input type="text" id="BookID" placeholder="Book ID" required>
-                        <input type="date" required>
-                        <input type="date" required>
-                        <button type="submit" class="btn" onclick="handleNewLoan()">Create Loan</button>
+            </div>
+            <!-- edit form -->
+            <div id="editMemberModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Member</h3>
+                    <form id="editMemberForm" onsubmit="handleEditMember(event)">
+                        <input type="hidden" id="editMemberId" name="id">
+                        <input type="text" id="editMemberFirstName" name="firstName" placeholder="First Name" required>
+                        <input type="text" id="editMemberLastName" name="lastName" placeholder="Last Name" required>
+                        <input type="email" id="editMemberEmail" name="email" placeholder="Email" required>
+                        <input type="tel" id="editMemberPhone" name="phone" placeholder="Phone" required>
+                        <input type="date" id="editMemberStartDate" name="startDate" placeholder="Start Date" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditMemberForm()">Cancel</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </section>
 
+        <!-- MEMBERS -->
         <section id="members" class="section">
             <h2>Members</h2>
             <div class="search-bar">
