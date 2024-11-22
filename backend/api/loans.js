@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
 
   try {
     // Check if the book has available copies
-    const book = await pool.query('SELECT Available_Copies FROM Book WHERE Book_ID = $1', [book_id]);
+    const book = await pool.query('SELECT Available_Copies FROM Book WHERE book_id = $1', [book_id]);
     if (book.rows.length === 0) {
       return res.status(404).json({ error: 'Book not found.' });
     }
@@ -53,13 +53,13 @@ router.post('/', async (req, res) => {
 
     // Create the loan with Loan_Date and Return_Date
     const loan = await pool.query(
-      'INSERT INTO Loan (Book_ID, Member_ID, Loan_Date, Return_Date) VALUES ($1, $2, $3, $4) RETURNING *',
+      'INSERT INTO Loan (book_id, member_id, loan_date, return_date) VALUES ($1, $2, $3, $4) RETURNING *',
       [book_id, member_id, loan_date || null, return_date || null]
     );
 
     // Decrement available copies
     await pool.query(
-      'UPDATE Book SET Available_Copies = Available_Copies - 1 WHERE Book_ID = $1',
+      'UPDATE Book SET Available_Copies = Available_Copies - 1 WHERE book_id = $1',
       [book_id]
     );
 

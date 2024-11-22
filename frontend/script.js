@@ -652,67 +652,70 @@ async function fetchLoans() {
 }
 
 async function searchLoans() {
-    const librarianId = librarianSearch.value.trim();
-    if (!librarianId) {
-      alert('Please enter a librarian ID to search.');
+    const loanId = document.getElementById('loanSearch').value.trim();
+    if (!loanId) {
+      alert('Please enter a loan ID to search.');
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/librarians/${librarianId}`);
+      const response = await fetch(`http://localhost:3000/api/loans/${loanId}`);
       if (response.ok) {
-        const librarian = await response.json();
+        const loan = await response.json();
 
-        librariansList = [librarian];
+        loansList = [loan]; // Assuming loansList is where you store your loan data
 
-        updateLibrarianDisplay();
+        updateLoanDisplay(); // Function to update the display with the search results
       } else if (response.status === 404) {
-        alert('librarian not found.');
+        alert('Loan not found.');
       } else {
-        console.error('Failed to fetch librarian:', response.statusText);
+        console.error('Failed to fetch loan:', response.statusText);
       }
     } catch (error) {
-      console.error('Error searching for librarian:', error);
+      console.error('Error searching for loan:', error);
     }
 }
 
+
 async function addLoan(event) {
     event.preventDefault(); // Prevent the default form submission behavior
+    
     // Gather form data
-    const librarianData = {
-        first_name: document.getElementById('librarian_first_name').value,
-        last_name: document.getElementById('librarian_last_name').value,
-        email: document.getElementById('librarian_email').value,
-        hire_date: document.getElementById('librarian_hire_date').value
+    const loanData = {
+        book_id: document.getElementById('bookId').value,
+        member_id: document.getElementById('memberId').value,
+        loan_date: document.getElementById('loanDate').value,
+        return_date: document.getElementById('returnDate').value
     };
 
-    console.log(librarianData);
+    console.log(loanData);
 
     try {
         // Send data to the backend
-        const response = await fetch('http://localhost:3000/api/librarians', {
+        const response = await fetch('http://localhost:3000/api/loans', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(librarianData),
+            body: JSON.stringify(loanData),
         });
 
         if (response.ok) {
-            const newLibrarian = await response.json();
-            console.log('librarian added successfully:', newLibrarian);
-            // Optionally refresh the librarian list
-            fetchLibrarians();
-            hideAddLibrarianForm();
+            const newLoan = await response.json();
+            console.log('Loan added successfully:', newLoan);
+            // Optionally refresh the loan list
+            fetchLoans(); // If you have a function to fetch and display the updated loan list
+            hideAddLoanForm();
         } else {
-            console.error('Failed to add librarian:', response.statusText);
-            alert('Failed to add librarian. Please try again.');
+            console.error('Failed to add loan:', response.statusText);
+            alert('Failed to add loan. Member or Book does not exist.');
         }
     } catch (error) {
-        console.error('Error adding librarian:', error);
-        alert('An error occurred while adding the librarian. Please try again.');
+        console.error('Error adding loan:', error);
+        alert('An error occurred while adding the loan. Please try again.');
     }
 }
+
 
 async function deleteLoan(id) {
     if (confirm('Are you sure you want to delete this librarian?')) {
