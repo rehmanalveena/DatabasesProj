@@ -1,4 +1,3 @@
-<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,38 +18,51 @@
     <main class="main-content">
         <section id="librarians" class="section active">
             <h2>Librarian Management</h2>
-            <div class="librarian-controls">
+
+            <!-- SEARCH BAR FOR LIBRARIANS -->
+            <div class="search-bar">
+                <input type="text" id="librarianSearch" placeholder="Search librarian by ID...">
+                <button class="btn" onclick="searchLibrarians()">Search</button>
                 <button class="btn btn-add" onclick="showAddLibrarianForm()">Add New Librarian</button>
             </div>
 
-            <div class="librarian-list">
-                <!-- be populated by js -->
-            </div>
+            <!-- LIBRARIANS -->
+            <body>
+                <h1>Librarians</h1>
+                <ul id="librarians-list">
 
-            <!-- add librarian form -->
-            <div class="modal" id="addLibrarianModal">
+                </ul>
+                <div class="librarians-list">
+                    <!-- The list of books will be populated here by JavaScript -->
+                </div>
+                <!-- <script src="script.js"></script> -->
+            </body>
+
+            <!-- ADD LIBRARIAN MODAL -->
+            <div id="addLibrarianModal" class="modal">
                 <div class="modal-content">
                     <h3>Add New Librarian</h3>
                     <form id="addLibrarianForm">
-                        <input type="text" placeholder="First Name" required>
-                        <input type="text" placeholder="Last Name" required>
-                        <input type="email" placeholder="Email" required>
-                        <input type="date" placeholder="Hire Date" required>
-                        <!--button type="submit" class="btn">Add Librarian</button-->
-                        <button class="btn" onclick="showAddLibrarianForm()">Add New Librarian</button>
+                        <input type="text" id="librarian_first_name" placeholder="First Name" required>
+                        <input type="text" id="librarian_last_name" placeholder="Last Name" required>
+                        <input type="email" id="librarian_email" placeholder="Email" required>
+                        <input type="date" id="librarian_hire_date" required>
+                        <button type="submit" class="btn btn-submit">Save</button>
                         <button type="button" class="btn btn-cancel" onclick="hideAddLibrarianForm()">Cancel</button>
                     </form>
                 </div>
             </div>
+
+            <!-- EDIT LIBRARIAN MODAL -->
             <div id="editLibrarianModal" class="modal">
                 <div class="modal-content">
                     <h3>Edit Librarian</h3>
-                    <form id="editLibrarianForm">
+                    <form id="editLibrarianForm" onsubmit="handleEditLibrarian(event)">
                         <input type="hidden" id="editLibrarianId" name="id">
-                        <input type="text" id="editFirstName" name="firstName" placeholder="First Name" required>
-                        <input type="text" id="editLastName" name="lastName" placeholder="Last Name" required>
-                        <input type="email" id="editEmail" name="email" placeholder="Email" required>
-                        <input type="date" id="editHireDate" name="hireDate" placeholder="Hire Date" required>
+                        <input type="text" id="editLibrarianFirstName" name="librarian_first_name" placeholder="First Name" required>
+                        <input type="text" id="editLibrarianLastName" name="librarian_last_name" placeholder="Last Name" required>
+                        <input type="email" id="editLibrarianEmail" name="librarian_email" placeholder="Email" required>
+                        <input type="date" id="editLibrarianHireDate" name="librarian_hire_date" placeholder="Hire Date" required>
                         <div class="modal-buttons">
                             <button type="submit" class="btn">Save Changes</button>
                             <button type="button" class="btn btn-cancel" onclick="hideEditLibrarianForm()">Cancel</button>
@@ -60,6 +72,7 @@
             </div>
         </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>

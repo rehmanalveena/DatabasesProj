@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- NAV BAR -->
     <nav class="navbar">
@@ -28,16 +30,15 @@
                 <button class="btn" onclick="searchBooks()">Search</button>
                 <button class="btn btn-add" onclick="showAddBookForm()">Add New Book</button>
             </div>
-             <!-- AVAILABLE BOOKS -->
-             <!DOCTYPE html>
+            <!-- AVAILABLE BOOKS -->
+            <!DOCTYPE html>
+
             <body>
-            <h1>Available Books</h1>
-            <ul id="books-list"> </ul>
-            <div class="books-list">
-                <!-- The list of books will be populated here by JavaScript -->
-            </div>
+                <h1>Available Books</h1>
+                <ul id="books-list"> </ul>
+                <div class="books-list"></div>
             </body>
-            </html>
+
             <!-- MODAL FOR ADDING BOOK -->
             <div id="addBookModal" class="modal">
                 <div class="modal-content">
@@ -53,7 +54,6 @@
                     </form>
                 </div>
             </div>
-
             <!-- edit form -->
             <div id="editBookModal" class="modal">
                 <div class="modal-content">
@@ -63,8 +63,10 @@
                         <input type="text" id="editBookTitle" name="title" placeholder="Title" required>
                         <input type="text" id="editBookAuthor" name="author" placeholder="Author" required>
                         <input type="text" id="editBookGenre" name="genre" placeholder="Genre" required>
-                        <input type="date" id="editBookPublicationDate" name="publicationDate" placeholder="Publication Date"> 
-                        <input type="number" id="editBookAvailableCopies" name="availableCopies" placeholder="Available Copies" required>
+                        <input type="date" id="editBookPublicationDate" name="publicationDate"
+                            placeholder="Publication Date">
+                        <input type="number" id="editBookAvailableCopies" name="availableCopies"
+                            placeholder="Available Copies" required>
                         <div class="modal-buttons">
                             <button type="submit" class="btn">Save Changes</button>
                             <button type="button" class="btn btn-cancel" onclick="hideEditBookForm()">Cancel</button>
@@ -83,11 +85,11 @@
                 <div class="new-loan">
                     <h3>Create New Loan</h3>
                     <form id="newLoanForm">
-                        <input type="text" placeholder="Member ID" required>
-                        <input type="text" placeholder="Book ID" required>
+                        <input type="text" id="MemberID" placeholder="Member ID" required>
+                        <input type="text" id="BookID" placeholder="Book ID" required>
                         <input type="date" required>
                         <input type="date" required>
-                        <button type="submit" class="btn">Create Loan</button>
+                        <button type="submit" class="btn" onclick="handleNewLoan()">Create Loan</button>
                     </form>
                 </div>
             </div>
@@ -100,12 +102,12 @@
                 <button class="btn" onclick="searchMembers()">Search</button>
                 <button class="btn btn-add" onclick="showAddMemberForm()">Add New Member</button>
             </div>
-           
+
             <ul id="member-list"></ul>
             <div class="member-list">
                 <!-- The list of members will be populated here by JavaScript -->
             </div>
-            
+
             <!-- Add/Edit Member Modal -->
             <div class="modal" id="addMemberModal">
                 <div class="modal-content">
@@ -141,7 +143,8 @@
             </div>
         </section>
     </main>
-    
+
     <script src="script.js"></script>
 </body>
+
 </html>

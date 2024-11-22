@@ -1,17 +1,15 @@
 booksList = [];
 membersList = [];
+librariansList = [];
+loansList = [];
 
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
     booksListElement = document.getElementById('books-list');
     membersListElement = document.getElementById('member-list');
-
+    librariansListElement = document.getElementById('librarians-list');
+    loansListElement = document.getElementById('loans-list');
     console.log('DOMContentLoaded fired');
-    if (membersListElement) {
-        console.log('booksList element found');
-    } else {
-        console.error('booksList element not found');
-    }
     
     // NAV BAR FUNCTIONS
     const navLinks = document.querySelectorAll('.nav-link');
@@ -35,10 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchBooks();
     fetchMembers();
-    console.log("fetched members");
+    fetchLibrarians();
+    fetchLoans();
     updateDisplays();
 
-    console.log("HELLO");
+    //console.log("HELLO");
 
     // Add the searchBooks function to the global scope for use in HTML
     window.searchBooks = searchBooks;
@@ -47,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateDisplays() {
     updateBookDisplay();
     // updateMemberDisplay();
-    // updateLoanDisplay();
-    // updateLibrarianDisplay();
+    updateLoanDisplay();
+    updateLibrarianDisplay();
 }
 
 async function updateBookDisplay() {
@@ -100,9 +99,9 @@ function updateLoanDisplay() {
         <div class="list-item">
             <div>
                 <h3>Loan #${loan.id}</h3>
-                <p>Member ID: ${loan.memberId}</p>
-                <p>Book ID: ${loan.bookId}</p>
-                <p>Return Date: ${loan.returnDate}</p>
+                <p>Member ID: ${loan.member_id}</p>
+                <p>Book ID: ${loan.book_id}</p>
+                <p>Return Date: ${loan.return_date}</p>
             </div>
             <div>
                 <button class="btn" onclick="extendLoan(${loan.id})">Extend</button>
@@ -113,19 +112,19 @@ function updateLoanDisplay() {
 }
 
 function updateLibrarianDisplay() {
-    const librarianList = document.querySelector('.librarian-list');
-    if (!librarianList) return;
+    const librariansListElement = document.querySelector('.librarians-list');
+    if (!librariansListElement) return;
     
-    librarianList.innerHTML = librarians.map(librarian => `
+    librariansListElement.innerHTML = librariansList.map(librarian => `
         <div class="list-item">
             <div>
-                <h3>${librarian.firstName} ${librarian.lastName}</h3>
+                <h3>${librarian.first_name} ${librarian.last_name}</h3>
                 <p>Email: ${librarian.email}</p>
-                <p>Hire Date: ${librarian.hireDate}</p>
+                <p>Librarian ID: ${librarian.librarian_id}</p>
             </div>
             <div>
-                <button class="btn" onclick="editLibrarian(${librarian.id})">Edit</button>
-                <button class="btn btn-cancel" onclick="deleteLibrarian(${librarian.id})">Delete</button>
+                <button class="btn" onclick="editLibrarian(${librarian.librarian_id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteLibrarian(${librarian.librarian_id})">Delete</button>
             </div>
         </div>
     `).join('');
@@ -179,6 +178,7 @@ async function searchBooks() {
       console.error('Error searching for book:', error);
     }
 }
+
 
 async function addBook(event) {
     event.preventDefault(); // Prevent the default form submission behavior
@@ -295,6 +295,169 @@ function editBook(id) {
         document.getElementById('editBookPublicationDate').value = book.publication_year;
         document.getElementById('editBookAvailableCopies').value = book.available_copies;
         showModal('editBookModal');
+    }
+}
+
+
+
+// LIBRARIAN -----------------------------------------------------
+
+async function fetchLibrarians() {
+    try {
+      const response = await fetch(`http://localhost:3000/api/librarians`);
+      if (response.ok) {
+        const data = await response.json();
+        librariansList = Array.isArray(data) ? data : data.librarians || [];
+        
+        updateLibrarianDisplay();
+      } else {
+        console.error('Failed to fetch librarians:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching librarians:', error);
+    }
+}
+
+async function searchLibrarians() {
+    const librarianId = librarianSearch.value.trim();
+    if (!librarianId) {
+      alert('Please enter a librarian ID to search.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/librarians/${librarianId}`);
+      if (response.ok) {
+        const librarian = await response.json();
+
+        librariansList = [librarian];
+
+        updateLibrarianDisplay();
+      } else if (response.status === 404) {
+        alert('librarian not found.');
+      } else {
+        console.error('Failed to fetch librarian:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error searching for librarian:', error);
+    }
+}
+
+async function addLibrarian(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    // Gather form data
+    const librarianData = {
+        first_name: document.getElementById('librarian_first_name').value,
+        last_name: document.getElementById('librarian_last_name').value,
+        email: document.getElementById('librarian_email').value,
+        hire_date: document.getElementById('librarian_hire_date').value
+    };
+
+    console.log(librarianData);
+
+    try {
+        // Send data to the backend
+        const response = await fetch('http://localhost:3000/api/librarians', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(librarianData),
+        });
+
+        if (response.ok) {
+            const newLibrarian = await response.json();
+            console.log('librarian added successfully:', newLibrarian);
+            // Optionally refresh the librarian list
+            fetchLibrarians();
+            hideAddLibrarianForm();
+        } else {
+            console.error('Failed to add librarian:', response.statusText);
+            alert('Failed to add librarian. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error adding librarian:', error);
+        alert('An error occurred while adding the librarian. Please try again.');
+    }
+}
+
+async function deleteLibrarian(id) {
+    if (confirm('Are you sure you want to delete this librarian?')) {
+        try {
+            // Send DELETE request to the backend API
+            const response = await fetch(`http://localhost:3000/api/librarians/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // Remove the book from the local `booksList`
+                librariansList = librariansList.filter(librarian => librarian.id !== id);
+
+                // Update the display after deletion
+                fetchLibrarians();
+
+                alert('librarian successfully deleted.');
+            } else if (response.status === 404) {
+                alert('librarian not found.');
+            } else {
+                console.error('Failed to delete librarian:', response.statusText);
+                alert('An error occurred while deleting the librarian.');
+            }
+        } catch (error) {
+            console.error('Error deleting librarian:', error);
+            alert('Could not delete the librarian. Please try again.');
+        }
+    }
+}
+
+async function handleEditLibrarian(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    const librarianId = document.getElementById('editLibrarianId').value;
+
+    // Gather form data
+    const librarianData = {
+        first_name: document.getElementById('editLibrarianFirstName').value,
+        last_name: document.getElementById('editLibrarianLastName').value,
+        email: document.getElementById('editLibrarianEmail').value,
+        hire_date: document.getElementById('editLibrarianHireDate').value
+    };
+
+    try {
+        // Send data to the backend
+        const response = await fetch(`http://localhost:3000/api/librarians/${librarianId}`, {
+            method: 'PUT', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(librarianData),
+        });
+
+        if (response.ok) {
+            const updatedLibrarian = await response.json();
+            console.log('Librarian edited successfully:', updatedLibrarian);
+            // Optionally refresh the librarian list
+            fetchLibrarians();
+            hideModal('editLibrarianModal');
+        } else {
+            console.error('Failed to edit librarian:', librarianId);
+            alert('Failed to edit librarian. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error editing librarian:', error);
+        alert('An error occurred while editing the librarian. Please try again.');
+    }
+}
+
+function editLibrarian(id) {
+    console.log("id is ", id);
+    const librarian = librariansList.find(librarian => librarian.librarian_id === id);
+    if (librarian) {
+        document.getElementById('editLibrarianId').value = librarian.librarian_id;
+        document.getElementById('editLibrarianFirstName').value = librarian.first_name;
+        document.getElementById('editLibrarianLastName').value = librarian.last_name;
+        document.getElementById('editLibrarianEmail').value = librarian.email;
+        document.getElementById('editLibrarianHireDate').value = librarian.hire_date;
+        showModal('editLibrarianModal');
     }
 }
 
@@ -468,62 +631,23 @@ async function deleteMember(id) {
 }
 
 
-// LIBRARIAN -----------------------------------------------------
-
-function handleNewLoan(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const loan = {
-        id: Date.now(),
-        memberId: formData.get('memberId'),
-        bookId: formData.get('bookId'),
-        loanDate: formData.get('loanDate'),
-        returnDate: formData.get('returnDate'),
-        status: 'active'
-    };
-    
-    loans.push(loan);
-    updateLoanDisplay();
-    event.target.reset();
-}
-
-function handleAddLibrarian(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const librarian = {
-        id: Date.now(),
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        email: formData.get('email'),
-        hireDate: formData.get('hireDate')
-    };
-    
-    librarians.push(librarian);
-    updateLibrarianDisplay();
-    hideModal('addLibrarianModal');
-    event.target.reset();
-}
-
-function editLibrarian(id) {
-    const librarian = librarians.find(librarian => librarian.id === id);
-    if (librarian) {
-        document.getElementById('editLibrarianId').value = librarian.id;
-        document.getElementById('editFirstName').value = librarian.firstName;
-        document.getElementById('editLastName').value = librarian.lastName;
-        document.getElementById('editEmail').value = librarian.email;
-        document.getElementById('editHireDate').value = librarian.hireDate;
-        showModal('editLibrarianModal');
-    }
-}
-
-function deleteLibrarian(id) {
-    if (confirm('Are you sure you want to delete this librarian?')) {
-        librarians = librarians.filter(librarian => librarian.id !== id);
-        updateLibrarianDisplay();
-    }
-}
-
 // LOAN -----------------------------------------------------
+
+async function fetchLoans() {
+    try {
+      const response = await fetch(`http://localhost:3000/api/loans`);
+      if (response.ok) {
+        const data = await response.json();
+        loansList = Array.isArray(data) ? data : data.loans || [];
+        
+        updateLibrarianDisplay();
+      } else {
+        console.error('Failed to fetch loans:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching loans:', error);
+    }
+}
 
 function handleNewLoan(event) {
     event.preventDefault();
@@ -592,7 +716,7 @@ function setupFormHandlers() {
     // add librarian form
     const addLibrarianForm = document.getElementById('addLibrarianForm');
     if (addLibrarianForm) {
-        addLibrarianForm.addEventListener('submit', handleAddLibrarian);
+        addLibrarianForm.addEventListener('submit', addLibrarian);
     }
 }
 
@@ -615,6 +739,10 @@ function hideAddMemberForm() {
 
 function showAddLibrarianForm() {
     showModal('addLibrarianModal');
+}
+
+function showEditLibrarianForm() {
+    showModal('editLibrarianModal');
 }
 
 function hideAddLibrarianForm() {
