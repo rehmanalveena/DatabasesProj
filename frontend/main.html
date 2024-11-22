@@ -121,6 +121,24 @@
                     </form>
                 </div>
             </div>
+            <!-- edit form -->
+            <div id="editMemberModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Member</h3>
+                    <form id="editMemberForm" onsubmit="handleEditMember(event)">
+                        <input type="hidden" id="editMemberId" name="id">
+                        <input type="text" id="editMemberFirstName" name="firstName" placeholder="First Name" required>
+                        <input type="text" id="editMemberLastName" name="lastName" placeholder="Last Name" required>
+                        <input type="email" id="editMemberEmail" name="email" placeholder="Email" required>
+                        <input type="tel" id="editMemberPhone" name="phone" placeholder="Phone" required>
+                        <input type="date" id="editMemberStartDate" name="startDate" placeholder="Start Date" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditMemberForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
     </main>
     

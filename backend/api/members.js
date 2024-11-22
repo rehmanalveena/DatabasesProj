@@ -57,7 +57,7 @@ router.put('/:id', async (req, res) => {
   const { first_name, last_name, email, phone_number, membership_start_date } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE Member SET First_Name = $1, Last_Name = $2, Email = $3, Phone_Number = $4, Membership_Start_Date = $5 WHERE Member_ID = $6 RETURNING *',
+      'UPDATE Member SET first_name = $1, last_name = $2, email = $3, phone_number = $4, membership_start_date = $5 WHERE member_id = $6 RETURNING *',
       [first_name, last_name, email, phone_number, membership_start_date, id]
     );
     if (result.rows.length === 0) {

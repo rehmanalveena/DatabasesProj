@@ -156,28 +156,27 @@ async function fetchBooks() {
 }
 
 async function searchBooks() {
-    const memberId = document.getElementById('memberSearch').value.trim();
-    if (!memberId) {
-        alert('Please enter a member ID to search.');
-        return;
+    const bookId = bookSearch.value.trim();
+    if (!bookId) {
+      alert('Please enter a book ID to search.');
+      return;
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
-        if (response.ok) {
-            const member = await response.json();
+      const response = await fetch(`http://localhost:3000/api/books/${bookId}`);
+      if (response.ok) {
+        const book = await response.json();
 
-            // Replace the current members list with the search result
-            membersList = [member];
+        booksList = [book];
 
-            updateMemberDisplay();
-        } else if (response.status === 404) {
-            alert('Member not found.');
-        } else {
-            console.error('Failed to fetch member:', response.statusText);
-        }
+        updateBookDisplay();
+      } else if (response.status === 404) {
+        alert('Book not found.');
+      } else {
+        console.error('Failed to fetch book:', response.statusText);
+      }
     } catch (error) {
-        console.error('Error searching for member:', error);
+      console.error('Error searching for book:', error);
     }
 }
 
@@ -314,19 +313,49 @@ async function fetchMembers() {
     }
 }
 
-function handleEditMember(event) {
-    event.preventDefault();
+async function handleEditMember(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
     const formData = new FormData(event.target);
-    const id = parseInt(formData.get('id'));
-    const member = members.find(member => member.id === id);
-    if (member) {
-        member.firstName = formData.get('firstName');
-        member.lastName = formData.get('lastName');
-        member.email = formData.get('email');
-        member.phone = formData.get('phone');
-        member.startDate = formData.get('startDate');
-        updateMemberDisplay();
-        hideModal('editMemberModal');
+    const memberId = formData.get('id'); // Get the member ID from the form
+    console.log("memberId", memberId);
+    const memberData = {
+        first_name: document.getElementById('editMemberFirstName').value,
+        last_name: document.getElementById('editMemberLastName').value,
+        email: document.getElementById('editMemberEmail').value,
+        phone_number: document.getElementById('editMemberPhone').value,
+        membership_start_date: document.getElementById('editMemberStartDate').value
+    };
+
+    try {
+        // Send data to the backend using a PUT request
+        const response = await fetch(`http://localhost:3000/api/members/${memberId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(memberData),
+        });
+
+        if (response.ok) {
+            const updatedMember = await response.json();
+            console.log('Member edited successfully:', updatedMember);
+            
+            // Optionally update the members array with the edited member
+            const index = membersList.findIndex(member => member.id === parseInt(memberId));
+            if (index !== -1) {
+                membersList[index] = updatedMember; // Replace the old member with the updated one
+            }
+            
+            // Update the display
+            fetchMembers();
+            hideModal('editMemberModal');
+        } else {
+            console.error('Failed to edit member:', memberId);
+            alert('Failed to edit member. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error editing member:', error);
+        alert('An error occurred while editing the member. Please try again.');
     }
 }
 
@@ -368,16 +397,16 @@ async function addMember(event) {
     }
 }
 
-
 function editMember(id) {
-    const member = members.find(member => member.id === id);
+    const member = membersList.find(member => member.member_id === id);
+    console.log(member);
     if (member) {
-        document.getElementById('editMemberId').value = member.id;
-        document.getElementById('editMemberFirstName').value = member.firstName;
-        document.getElementById('editMemberLastName').value = member.lastName;
+        document.getElementById('editMemberId').value = member.member_id;
+        document.getElementById('editMemberFirstName').value = member.first_name;
+        document.getElementById('editMemberLastName').value = member.last_name;
         document.getElementById('editMemberEmail').value = member.email;
-        document.getElementById('editMemberPhone').value = member.phone;
-        document.getElementById('editMemberStartDate').value = member.startDate;
+        document.getElementById('editMemberPhone').value = member.phone_number;
+        document.getElementById('editMemberStartDate').value = member.membership_start_date;
         showModal('editMemberModal');
     }
 }
@@ -567,7 +596,7 @@ function setupFormHandlers() {
     }
 }
 
-// MODAL 
+// MODAL ------------------------------------------
 function showAddBookForm() {
     showModal('addBookModal');
 }
