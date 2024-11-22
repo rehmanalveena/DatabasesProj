@@ -1,10 +1,26 @@
-let booksList;
+//let booksList;
+//let membersList;
 
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
-    fetchBooks();
     booksList = document.getElementById('books-list');
+    //membersList = document.getElementById('members-list');
+
+    console.log('DOMContentLoaded fired');
+    if (booksList) {
+        console.log('booksList element found');
+    } else {
+        console.error('booksList element not found');
+    }
+    
+    // NAV BAR FUNCTIONS
     const navLinks = document.querySelectorAll('.nav-link');
+    if (navLinks.length > 0) {
+        console.log('navLinks found');
+    } else {
+        console.error('No navLinks found');
+    }
+
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             if (link.getAttribute('href').startsWith('#')) {
@@ -22,7 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // form submissions
     setupFormHandlers();
 
-    updateDisplays();
+    // fetchBooks();
+    // console.log("fetch books called");
+    // updateDisplays();
+    // console.log("updateDisplays called");
+
+    
+        console.log('Calling fetchBooks...');
+        fetchBooks();
+        console.log('fetchBooks completed.');
+
+        console.log('Calling updateDisplays...');
+        updateDisplays();
+        console.log('updateDisplays completed.');
+ 
+
+    fetchBooks();
 
     // Add the searchBooks function to the global scope for use in HTML
     window.searchBooks = searchBooks;
@@ -41,6 +72,20 @@ async function fetchBooks() {
         } catch (error) {
           console.error('Error fetching books:', error);
         }
+}
+
+async function fetchMembers() {
+    try {
+      const response = await fetch('http://localhost:3000/api/members');
+      if (response.ok) {
+        booksList = await response.json();
+        updateMemberDisplay();
+      } else {
+        console.error('Failed to fetch members:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    }
 }
  // Search for a book by ID
 async function searchBooks() {
@@ -131,7 +176,7 @@ function setupFormHandlers() {
     // add book form
     const addBookForm = document.getElementById('addBookForm');
     if (addBookForm) {
-        addBookForm.addEventListener('submit', handleAddBook);
+        addBookForm.addEventListener('submit', addBook);
     }
 
     // add member form
@@ -221,20 +266,44 @@ function handleEditMember(event) {
     }
 }
 
-function handleEditBook(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const id = parseInt(formData.get('id')); // Find the book in booksList
-    const book = booksList.find(book => book.id === id);
-    if (book) {
-        // update info
-        book.title = formData.get('title');
-        book.author_name = formData.get('author');
-        book.genre = formData.get('genre');
-        book.publication_year = formData.get('publicationDate');
-        book.available_copies = parseInt(formData.get('availableCopies'));
-        updateBookDisplay();
-        hideModal('editBookModal');
+async function handleEditBook(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    const bookId = document.getElementById('editBookId').value;
+
+    // Gather form data
+    const bookData = {
+        title: document.getElementById('editBookTitle').value,
+        author_name: document.getElementById('editBookAuthor').value,
+        publication_year: document.getElementById('editBookPublicationDate').value,
+        genre: document.getElementById('editBookGenre').value,
+        available_copies: parseInt(document.getElementById('editBookAvailableCopies').value, 10),
+    };
+
+    //console.log(bookData);
+
+    try {
+        // Send data to the backend
+        const response = await fetch(`http://localhost:3000/api/books/${bookId}`, {
+            method: 'PUT', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bookData),
+        });
+
+        if (response.ok) {
+            const newBook = await response.json();
+            console.log('Book edited successfully:', newBook);
+            // Optionally refresh the book list
+            fetchBooks();
+            hideModal('editBookModal');
+        } else {
+            console.error('Failed to edit book:', bookId);
+            alert('Failed to edit book. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error editing book:', error);
+        alert('An error occurred while editing the book. Please try again.');
     }
 }
 
@@ -264,9 +333,9 @@ function editMember(id) {
 }
 
 function editBook(id) {
-    const book = booksList.find(book => book.id === id);
+    const book = booksList.find(book => book.book_id === id);
     if (book) {
-        document.getElementById('editBookId').value = book.id;
+        document.getElementById('editBookId').value = book.book_id;
         document.getElementById('editBookTitle').value = book.title;
         document.getElementById('editBookAuthor').value = book.author_name;
         document.getElementById('editBookGenre').value = book.genre;
@@ -288,9 +357,9 @@ function searchMembers() {
 // display updates
 function updateDisplays() {
     updateBookDisplay();
-    updateMemberDisplay();
-    updateLoanDisplay();
-    updateLibrarianDisplay();
+    // updateMemberDisplay();
+    // updateLoanDisplay();
+    // updateLibrarianDisplay();
 }
 
 async function updateBookDisplay() {
@@ -303,7 +372,6 @@ async function updateBookDisplay() {
                 <p>Author: ${book.author_name}</p>
                 <p>Genre: ${book.genre}</p>
                 <p>Available Copies: ${book.available_copies}</p>
-                <p>id: ${book.book_id}</p>
             </div>
             <div>
                 <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
@@ -313,20 +381,20 @@ async function updateBookDisplay() {
     `).join('');
 }
 
-function updateMemberDisplay(membersToShow = members) {
-    const memberList = document.querySelector('.member-list');
-    if (!memberList) return;
+function updateMemberDisplay() {
+    const memberListElement = document.querySelector('.member-list');
+    if (!memberListElement) return;
     
-    memberList.innerHTML = membersToShow.map(member => `
+    memberListElement.innerHTML = membersList.map(member => `
         <div class="list-item">
             <div>
-                <h3>${member.firstName} ${member.lastName}</h3>
+                <h3>${member.first_name} ${member.last_name}</h3>
                 <p>Email: ${member.email}</p>
-                <p>Phone: ${member.phone}</p>
+                <p>Phone: ${member.phone_number}</p>
             </div>
             <div>
-                <button class="btn" onclick="editMember(${member.id})">Edit</button>
-                <button class="btn btn-cancel" onclick="deleteMember(${member.id})">Delete</button>
+                <button class="btn" onclick="editMember(${member.member_id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteMember(${member.member_id})">Delete</button>
             </div>
         </div>
     `).join('');

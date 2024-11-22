@@ -61,12 +61,12 @@
             <div id="editBookModal" class="modal">
                 <div class="modal-content">
                     <h3>Edit Book</h3>
-                    <form id="editBookForm">
+                    <form id="editBookForm" onsubmit="handleEditBook(event)">
                         <input type="hidden" id="editBookId" name="id">
                         <input type="text" id="editBookTitle" name="title" placeholder="Title" required>
                         <input type="text" id="editBookAuthor" name="author" placeholder="Author" required>
                         <input type="text" id="editBookGenre" name="genre" placeholder="Genre" required>
-                        <input type="date" id="editBookPublicationDate" name="publicationDate" placeholder="Publication Date" required>
+                        <input type="date" id="editBookPublicationDate" name="publicationDate" placeholder="Publication Date"> 
                         <input type="number" id="editBookAvailableCopies" name="availableCopies" placeholder="Available Copies" required>
                         <div class="modal-buttons">
                             <button type="submit" class="btn">Save Changes</button>
