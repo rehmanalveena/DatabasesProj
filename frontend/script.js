@@ -1,5 +1,5 @@
-//let booksList;
-//let membersList;
+// let booksList;
+// let membersList;
 
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
  
 
     fetchBooks();
+
+    console.log("HELLO");
 
     // Add the searchBooks function to the global scope for use in HTML
     window.searchBooks = searchBooks;
@@ -362,24 +364,75 @@ function updateDisplays() {
     // updateLibrarianDisplay();
 }
 
+// async function updateBookDisplay() {
+//     const bookListElement = document.querySelector('.books-list');
+//     if (!bookListElement) return;
+
+//     bookListElement.innerHTML = booksList.map(book => `
+//         <div class="list-item">
+//             <div>
+//                 <h3>${book.title}</h3>
+//                 <p>Author: ${book.author_name}</p>
+//                 <p>Genre: ${book.genre}</p>
+//                 <p>Available Copies: ${book.available_copies}</p>
+//                 <p>Book ID: ${book.book_id}</p>
+//             </div>
+//             <div>
+//                 <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
+//                 <button class="btn btn-cancel" onclick="deleteBook(${book.book_id})">Delete</button>
+//             </div>
+//         </div>
+//     `).join('');
+// }
+
 async function updateBookDisplay() {
     const bookListElement = document.querySelector('.books-list');
     if (!bookListElement) return;
-    bookListElement.innerHTML = booksList.map(book => `
-        <div class="list-item">
-            <div>
-                <h3>${book.title}</h3>
-                <p>Author: ${book.author_name}</p>
-                <p>Genre: ${book.genre}</p>
-                <p>Available Copies: ${book.available_copies}</p>
-            </div>
-            <div>
-                <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
-                <button class="btn btn-cancel" onclick="deleteBook(${book.book_id})">Delete</button>
-            </div>
-        </div>
-    `).join('');
+
+    // Clear existing content
+    bookListElement.innerHTML = '';
+
+    // Iterate over booksList and create DOM elements
+    booksList.forEach(book => {
+        // Create a container div for each book
+        const listItem = document.createElement('div');
+        listItem.className = 'list-item';
+
+        // Create inner content
+        const bookInfo = document.createElement('div');
+        bookInfo.innerHTML = `
+            <h3>${book.title}</h3>
+            <p>Author: ${book.author_name}</p>
+            <p>Genre: ${book.genre}</p>
+            <p>Available Copies: ${book.available_copies}</p>
+            <p>Book ID: ${book.book_id}</p>
+        `;
+
+        // Create buttons container
+        const buttonsContainer = document.createElement('div');
+        const editButton = document.createElement('button');
+        editButton.className = 'btn';
+        editButton.textContent = 'Edit';
+        editButton.onclick = () => editBook(book.book_id);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-cancel';
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = () => deleteBook(book.book_id);
+
+        // Append buttons to buttons container
+        buttonsContainer.appendChild(editButton);
+        buttonsContainer.appendChild(deleteButton);
+
+        // Append book info and buttons to list item
+        listItem.appendChild(bookInfo);
+        listItem.appendChild(buttonsContainer);
+
+        // Append list item to the main book list
+        bookListElement.appendChild(listItem);
+    });
 }
+
 
 function updateMemberDisplay() {
     const memberListElement = document.querySelector('.member-list');
