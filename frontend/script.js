@@ -752,11 +752,11 @@ async function handleEditLoan(event) {
 
     // Gather form data
     const loanData = {
-        loan_id: document.getElementById('editLoanId').value = loan.loan_id,
-        member_id: document.getElementById('editLoanMemberId').value = loan.member_id,
-        book_id: document.getElementById('editLoanBookId').value = loan.book_id,
-        loan_date: document.getElementById('editLoanDate').value = loan.loan_date,
-        return_date: document.getElementById('editLoanReturnDate').value = loan.return_date
+        loan_id: loanId, // You can directly use loanId here
+        member_id: document.getElementById('editLoanMemberId').value,
+        book_id: document.getElementById('editLoanBookId').value,
+        loan_date: document.getElementById('editLoanDate').value,
+        return_date: document.getElementById('editReturnDate').value
     };
 
     try {
@@ -772,18 +772,19 @@ async function handleEditLoan(event) {
         if (response.ok) {
             const updatedLoan = await response.json();
             console.log('Loan edited successfully:', updatedLoan);
-            // Optionally refresh the librarian list
+            // Optionally refresh the loan list
             fetchLoans();
             hideModal('editLoanModal');
         } else {
             console.error('Failed to edit loan:', loanId);
-            alert('Failed to edit loan. Please try again.');
+            alert('Failed to edit loan. Member or Book does not exist.');
         }
     } catch (error) {
         console.error('Error editing loan:', error);
         alert('An error occurred while editing the loan. Please try again.');
     }
 }
+
 
 function editLoan(id) {
     console.log("id is ", id);
@@ -793,7 +794,7 @@ function editLoan(id) {
         document.getElementById('editLoanMemberId').value = loan.member_id;
         document.getElementById('editLoanBookId').value = loan.book_id;
         document.getElementById('editLoanDate').value = loan.loan_date;
-        document.getElementById('editLoanReturnDate').value = loan.return_date;
+        document.getElementById('editReturnDate').value = loan.return_date;
         showModal('editLoanModal');
     }
 }
