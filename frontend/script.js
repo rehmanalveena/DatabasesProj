@@ -1,4 +1,4 @@
-booksList=[];
+booksList = [];
 // let membersList;
 
 // navigation
@@ -15,11 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // NAV BAR FUNCTIONS
     const navLinks = document.querySelectorAll('.nav-link');
-    if (navLinks.length > 0) {
-        console.log('navLinks found');
-    } else {
-        console.error('No navLinks found');
-    }
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -106,7 +101,7 @@ async function searchBooks() {
 
 async function addBook(event) {
     event.preventDefault(); // Prevent the default form submission behavior
-
+    console.log("just called");
     // Gather form data
     const bookData = {
         title: document.getElementById('bookTitle').value,
@@ -116,7 +111,10 @@ async function addBook(event) {
         available_copies: parseInt(document.getElementById('availableCopies').value, 10),
     };
 
+    console.log("gathered form data", bookData);
+
     try {
+        console.log("entered try catch");
         // Send data to the backend
         const response = await fetch('http://localhost:3000/api/books', {
             method: 'POST',
@@ -125,17 +123,21 @@ async function addBook(event) {
             },
             body: JSON.stringify(bookData),
         });
+        console.log("sent to backend");
 
         if (response.ok) {
+            console.log("response okay");
             const newBook = await response.json();
             console.log('Book added successfully:', newBook);
             // Optionally refresh the book list
             fetchBooks();
+            console.log("fetching books and displaying");
             hideAddBookForm();
         } else {
             console.error('Failed to add book:', response.statusText);
             alert('Failed to add book. Please try again.');
         }
+        console.log("finished");
     } catch (error) {
         console.error('Error adding book:', error);
         alert('An error occurred while adding the book. Please try again.');

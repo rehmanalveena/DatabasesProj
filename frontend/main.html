@@ -38,21 +38,21 @@
             <div class="books-list">
                 <!-- The list of books will be populated here by JavaScript -->
             </div>
-            <script src="script.js"></script>
+            <!-- <script src="script.js"></script> -->
             </body>
             </html>
             <!-- MODAL FOR ADDING BOOK -->
             <div id="addBookModal" class="modal">
                 <div class="modal-content">
                     <h3>Add New Book</h3>
-                    <form id="addBookForm" onsubmit="addBook(event)">
+                    <form id="addBookForm">
                         <input type="text" id="bookTitle" placeholder="Title" required>
                         <input type="text" id="authorName" placeholder="Author Name" required>
                         <input type="text" id="genre" placeholder="Genre" required>
                         <input type="date" id="publishDate" required>
                         <input type="number" id="availableCopies" placeholder="Available Copies" required>
                         <button type="submit" class="btn btn-submit">Save</button>
-                        <button type="submit" class="btn btn-cancel" onclick="hideAddBookForm()">Cancel</button>
+                        <button type="button" class="btn btn-cancel" onclick="hideAddBookForm()">Cancel</button>
                     </form>
                 </div>
             </div>
