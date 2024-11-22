@@ -32,13 +32,10 @@
              <!DOCTYPE html>
             <body>
             <h1>Available Books</h1>
-            <ul id="books-list"> 
-                 
-            </ul>
+            <ul id="books-list"> </ul>
             <div class="books-list">
                 <!-- The list of books will be populated here by JavaScript -->
             </div>
-            <!-- <script src="script.js"></script> -->
             </body>
             </html>
             <!-- MODAL FOR ADDING BOOK -->
@@ -99,21 +96,26 @@
         <section id="members" class="section">
             <h2>Members</h2>
             <div class="search-bar">
-                <input type="text" placeholder="Search members..." id="memberSearch">
+                <input type="text" placeholder="Search members by ID..." id="memberSearch">
                 <button class="btn" onclick="searchMembers()">Search</button>
                 <button class="btn btn-add" onclick="showAddMemberForm()">Add New Member</button>
             </div>
-            <div class="member-list"></div>
+           
+            <ul id="member-list"></ul>
+            <div class="member-list">
+                <!-- The list of members will be populated here by JavaScript -->
+            </div>
+            
             <!-- Add/Edit Member Modal -->
             <div class="modal" id="addMemberModal">
                 <div class="modal-content">
                     <h3>Add/Edit Member</h3>
                     <form id="addMemberForm">
-                        <input type="text" placeholder="First Name" required>
-                        <input type="text" placeholder="Last Name" required>
-                        <input type="email" placeholder="Email" required>
-                        <input type="tel" placeholder="Phone" required>
-                        <input type="date" required>
+                        <input type="text" id="firstName" placeholder="First Name" required>
+                        <input type="text" id="lastName" placeholder="Last Name" required>
+                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="tel" id="phone" placeholder="Phone" required>
+                        <input type="date" id="startDate" required>
                         <button type="submit" class="btn">Save</button>
                         <button type="button" class="btn btn-cancel" onclick="hideAddMemberForm()">Cancel</button>
                     </form>

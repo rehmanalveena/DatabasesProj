@@ -4,10 +4,10 @@ membersList = [];
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
     booksListElement = document.getElementById('books-list');
-    membersListElement = document.getElementById('members-list');
+    membersListElement = document.getElementById('member-list');
 
     console.log('DOMContentLoaded fired');
-    if (booksListElement) {
+    if (membersListElement) {
         console.log('booksList element found');
     } else {
         console.error('booksList element not found');
@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchBooks();
     fetchMembers();
+    console.log("fetched members");
     updateDisplays();
 
     console.log("HELLO");
@@ -81,6 +82,7 @@ function updateMemberDisplay() {
                 <h3>${member.first_name} ${member.last_name}</h3>
                 <p>Email: ${member.email}</p>
                 <p>Phone: ${member.phone_number}</p>
+                <p>Member ID: ${member.member_id}</p>
             </div>
             <div>
                 <button class="btn" onclick="editMember(${member.member_id})">Edit</button>
@@ -129,7 +131,6 @@ function updateLibrarianDisplay() {
     `).join('');
 }
 
-// section Display
 function showSection(sectionId) {
     const sections = document.querySelectorAll('.section');
     sections.forEach(section => {
@@ -154,29 +155,29 @@ async function fetchBooks() {
         }
 }
 
- // Search for a book by ID
 async function searchBooks() {
-    const bookId = bookSearch.value.trim();
-    if (!bookId) {
-      alert('Please enter a book ID to search.');
-      return;
+    const memberId = document.getElementById('memberSearch').value.trim();
+    if (!memberId) {
+        alert('Please enter a member ID to search.');
+        return;
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/books/${bookId}`);
-      if (response.ok) {
-        const book = await response.json();
+        const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
+        if (response.ok) {
+            const member = await response.json();
 
-        booksList = [book];
+            // Replace the current members list with the search result
+            membersList = [member];
 
-        updateBookDisplay();
-      } else if (response.status === 404) {
-        alert('Book not found.');
-      } else {
-        console.error('Failed to fetch book:', response.statusText);
-      }
+            updateMemberDisplay();
+        } else if (response.status === 404) {
+            alert('Member not found.');
+        } else {
+            console.error('Failed to fetch member:', response.statusText);
+        }
     } catch (error) {
-      console.error('Error searching for book:', error);
+        console.error('Error searching for member:', error);
     }
 }
 
@@ -303,7 +304,7 @@ async function fetchMembers() {
     try {
       const response = await fetch('http://localhost:3000/api/members');
       if (response.ok) {
-        booksList = await response.json();
+        membersList = await response.json();
         updateMemberDisplay();
       } else {
         console.error('Failed to fetch members:', response.statusText);
@@ -329,23 +330,44 @@ function handleEditMember(event) {
     }
 }
 
-function handleAddMember(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const member = {
-        id: Date.now(),
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        startDate: formData.get('startDate')
+async function addMember(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Gather form data
+    const memberData = {
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone_number: document.getElementById('phone').value,
+        membership_start_date: document.getElementById('startDate').value,
     };
-    
-    members.push(member);
-    updateMemberDisplay();
-    hideModal('addMemberModal');
-    event.target.reset();
+
+    try {
+        // Send data to the backend
+        const response = await fetch('http://localhost:3000/api/members', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(memberData),
+        });
+
+        if (response.ok) {
+            const newMember = await response.json();
+            console.log('Member added successfully: ', newMember);
+
+            fetchMembers();
+            hideModal('addMemberModal');
+        } else {
+            console.error('Failed to add member:', response.statusText);
+            alert('Failed to add member. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error adding member:', error);
+        alert('An error occurred while adding the member. Please try again.');
+    }
 }
+
 
 function editMember(id) {
     const member = members.find(member => member.id === id);
@@ -360,21 +382,62 @@ function editMember(id) {
     }
 }
 
-function searchMembers() {
-    const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
-    const filteredMembers = members.filter(member =>
-        `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchTerm) ||
-        member.email.toLowerCase().includes(searchTerm)
-    );
-    updateMemberDisplay(filteredMembers);
-}
+async function searchMembers() {
+    const memberId = document.getElementById('memberSearch').value.trim();
+    if (!memberId) {
+        alert('Please enter a member ID to search.');
+        return;
+    }
 
-function deleteMember(id) {
-    if (confirm('Are you sure you want to delete this member?')) {
-        members = members.filter(member => member.id !== id);
-        updateMemberDisplay();
+    try {
+        const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
+        if (response.ok) {
+            const member = await response.json();
+
+            // Replace the current members list with the search result
+            membersList = [member];
+
+            updateMemberDisplay();
+        } else if (response.status === 404) {
+            alert('Member not found.');
+        } else {
+            console.error('Failed to fetch member:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error searching for member:', error);
     }
 }
+
+async function deleteMember(id) {
+    console.log("to delete: ", id);
+    if (confirm('Are you sure you want to delete this member?')) {
+        try {
+            // Send DELETE request to the backend API
+            const response = await fetch(`http://localhost:3000/api/members/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // Remove the member from the local `members` list
+                membersList = membersList.filter(member => member.id !== id);
+
+                // Update the display after deletion
+                fetchMembers();
+
+                alert('Member successfully deleted.');
+            } else if (response.status === 404) {
+                alert('Member not found.');
+            } else {
+                console.error('Failed to delete member:', response.statusText);
+                alert('An error occurred while deleting the member.');
+            }
+        } catch (error) {
+            console.error('Error deleting member:', error);
+            alert('Could not delete the member. Please try again.');
+        }
+    }
+}
+
 
 // LIBRARIAN -----------------------------------------------------
 
@@ -488,7 +551,7 @@ function setupFormHandlers() {
     // add member form
     const addMemberForm = document.getElementById('addMemberForm');
     if (addMemberForm) {
-        addMemberForm.addEventListener('submit', handleAddMember);
+        addMemberForm.addEventListener('submit', addMember);
     }
 
     // new loan form

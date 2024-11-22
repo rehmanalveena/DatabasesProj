@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
   const { first_name, last_name, email, phone_number, membership_start_date } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO Member (First_Name, Last_Name, Email, Phone_Number, Membership_Start_Date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO Member (first_name, last_name, email, phone_number, membership_start_date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [first_name, last_name, email, phone_number, membership_start_date]
     );
     res.status(201).json(result.rows[0]);
@@ -74,7 +74,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('DELETE FROM Member WHERE Member_ID = $1 RETURNING *', [id]);
+    const result = await pool.query('DELETE FROM Member WHERE member_id = $1 RETURNING *', [id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Member not found' });
     }
