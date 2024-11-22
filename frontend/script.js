@@ -1,12 +1,14 @@
 booksList = [];
 membersList = [];
 librariansList = [];
+loansList = [];
 
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
     booksListElement = document.getElementById('books-list');
     membersListElement = document.getElementById('member-list');
     librariansListElement = document.getElementById('librarians-list');
+    loansListElement = document.getElementById('loans-list');
     console.log('DOMContentLoaded fired');
     
     // NAV BAR FUNCTIONS
@@ -32,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchBooks();
     fetchMembers();
     fetchLibrarians();
+    fetchLoans();
     updateDisplays();
 
     //console.log("HELLO");
@@ -43,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateDisplays() {
     updateBookDisplay();
     // updateMemberDisplay();
-    // updateLoanDisplay();
+    updateLoanDisplay();
     updateLibrarianDisplay();
 }
 
@@ -96,9 +99,9 @@ function updateLoanDisplay() {
         <div class="list-item">
             <div>
                 <h3>Loan #${loan.id}</h3>
-                <p>Member ID: ${loan.memberId}</p>
-                <p>Book ID: ${loan.bookId}</p>
-                <p>Return Date: ${loan.returnDate}</p>
+                <p>Member ID: ${loan.member_id}</p>
+                <p>Book ID: ${loan.book_id}</p>
+                <p>Return Date: ${loan.return_date}</p>
             </div>
             <div>
                 <button class="btn" onclick="extendLoan(${loan.id})">Extend</button>
@@ -152,30 +155,30 @@ async function fetchBooks() {
 }
 
 async function searchBooks() {
-    const memberId = document.getElementById('memberSearch').value.trim();
-    if (!memberId) {
-        alert('Please enter a member ID to search.');
-        return;
+    const bookId = bookSearch.value.trim();
+    if (!bookId) {
+      alert('Please enter a book ID to search.');
+      return;
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
-        if (response.ok) {
-            const member = await response.json();
+      const response = await fetch(`http://localhost:3000/api/books/${bookId}`);
+      if (response.ok) {
+        const book = await response.json();
 
-            // Replace the current members list with the search result
-            membersList = [member];
+        booksList = [book];
 
-            updateMemberDisplay();
-        } else if (response.status === 404) {
-            alert('Member not found.');
-        } else {
-            console.error('Failed to fetch member:', response.statusText);
-        }
+        updateBookDisplay();
+      } else if (response.status === 404) {
+        alert('Book not found.');
+      } else {
+        console.error('Failed to fetch book:', response.statusText);
+      }
     } catch (error) {
-        console.error('Error searching for member:', error);
+      console.error('Error searching for book:', error);
     }
 }
+
 
 async function addBook(event) {
     event.preventDefault(); // Prevent the default form submission behavior
@@ -527,7 +530,6 @@ async function addMember(event) {
     }
 }
 
-
 function editMember(id) {
     const member = members.find(member => member.id === id);
     if (member) {
@@ -600,21 +602,20 @@ async function deleteMember(id) {
 
 // LOAN -----------------------------------------------------
 
-function handleNewLoan(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const loan = {
-        id: Date.now(),
-        memberId: formData.get('memberId'),
-        bookId: formData.get('bookId'),
-        loanDate: formData.get('loanDate'),
-        returnDate: formData.get('returnDate'),
-        status: 'active'
-    };
-    
-    loans.push(loan);
-    updateLoanDisplay();
-    event.target.reset();
+async function fetchLoans() {
+    try {
+      const response = await fetch(`http://localhost:3000/api/loans`);
+      if (response.ok) {
+        const data = await response.json();
+        loansList = Array.isArray(data) ? data : data.loans || [];
+        
+        updateLibrarianDisplay();
+      } else {
+        console.error('Failed to fetch loans:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching loans:', error);
+    }
 }
 
 function handleNewLoan(event) {
