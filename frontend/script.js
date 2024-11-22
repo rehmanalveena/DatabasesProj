@@ -1,10 +1,26 @@
-let booksList;
+booksList=[];
+// let membersList;
 
 // navigation
 document.addEventListener('DOMContentLoaded', () => {
-    fetchBooks();
-    booksList = document.getElementById('books-list');
+    booksListElement = document.getElementById('books-list');
+    //membersList = document.getElementById('members-list');
+
+    console.log('DOMContentLoaded fired');
+    if (booksListElement) {
+        console.log('booksList element found');
+    } else {
+        console.error('booksList element not found');
+    }
+    
+    // NAV BAR FUNCTIONS
     const navLinks = document.querySelectorAll('.nav-link');
+    if (navLinks.length > 0) {
+        console.log('navLinks found');
+    } else {
+        console.error('No navLinks found');
+    }
+
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             if (link.getAttribute('href').startsWith('#')) {
@@ -22,49 +38,45 @@ document.addEventListener('DOMContentLoaded', () => {
     // form submissions
     setupFormHandlers();
 
-    fetchBooks();  // Fetch books from the backend
+    fetchBooks();
+    console.log("fetch books called");
     updateDisplays();
+    console.log("updateDisplays called");
+
+    console.log("HELLO");
 
     // Add the searchBooks function to the global scope for use in HTML
     window.searchBooks = searchBooks;
 });
 
-// Fetch books from the backend API
+// BOOK -----------------------------------------------------
 async function fetchBooks() {
         try {
           const response = await fetch('http://localhost:3000/api/books');
           if (response.ok) {
-            const books = await response.json();
-            
-            // Clear the list before adding new books
-            booksList.innerHTML = '';
-            
-            // Iterate through the books and create list items for each
-            books.forEach(book => {
-              const listItem = document.createElement('li');
-              listItem.classList.add('book-item');
-              
-              // Format the publication year to a more readable format
-              const formattedDate = new Date(book.publication_year).toLocaleDateString();
-    
-              // Add the book details to the list item
-              listItem.innerHTML = `
-                <strong>Title:</strong> ${book.title} <br>
-                <strong>Author:</strong> ${book.author_name} <br>
-                <strong>Publication Year:</strong> ${formattedDate} <br>
-                <strong>Genre:</strong> ${book.genre} <br>
-                <strong>Available Copies:</strong> ${book.available_copies}
-              `;
-              
-              // Append the list item to the books list
-              booksList.appendChild(listItem);
-            });
+            const data = await response.json();
+            booksList = Array.isArray(data) ? data : data.books || [];
+            updateBookDisplay();
           } else {
             console.error('Failed to fetch books:', response.statusText);
           }
         } catch (error) {
           console.error('Error fetching books:', error);
         }
+}
+
+async function fetchMembers() {
+    try {
+      const response = await fetch('http://localhost:3000/api/members');
+      if (response.ok) {
+        booksList = await response.json();
+        updateMemberDisplay();
+      } else {
+        console.error('Failed to fetch members:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    }
 }
  // Search for a book by ID
 async function searchBooks() {
@@ -79,27 +91,9 @@ async function searchBooks() {
       if (response.ok) {
         const book = await response.json();
 
-        // Clear the list before displaying the searched book
-        booksList.innerHTML = '';
+        booksList = [book];
 
-        // Format the publication year to a more readable format
-        const formattedDate = new Date(book.publication_year).toLocaleDateString();
-
-        // Create a list item for the book
-        const listItem = document.createElement('li');
-        listItem.classList.add('book-item');
-
-        // Add the book details to the list item
-        listItem.innerHTML = `
-          <strong>Title:</strong> ${book.title} <br>
-          <strong>Author:</strong> ${book.author_name} <br>
-          <strong>Publication Year:</strong> ${formattedDate} <br>
-          <strong>Genre:</strong> ${book.genre} <br>
-          <strong>Available Copies:</strong> ${book.available_copies}
-        `;
-
-        // Append the list item to the books list
-        booksList.appendChild(listItem);
+        updateBookDisplay();
       } else if (response.status === 404) {
         alert('Book not found.');
       } else {
@@ -148,7 +142,6 @@ async function addBook(event) {
     }
 }
 
-
 // section Display
 function showSection(sectionId) {
     const sections = document.querySelectorAll('.section');
@@ -173,7 +166,7 @@ function setupFormHandlers() {
     // add book form
     const addBookForm = document.getElementById('addBookForm');
     if (addBookForm) {
-        addBookForm.addEventListener('submit', handleAddBook);
+        addBookForm.addEventListener('submit', addBook);
     }
 
     // add member form
@@ -263,19 +256,42 @@ function handleEditMember(event) {
     }
 }
 
-function handleEditBook(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const id = parseInt(formData.get('id'));
-    const book = books.find(book => book.id === id);
-    if (book) {
-        book.title = formData.get('title');
-        book.author = formData.get('author');
-        book.genre = formData.get('genre');
-        book.publicationDate = formData.get('publicationDate');
-        book.availableCopies = parseInt(formData.get('availableCopies'));
-        updateBookDisplay();
-        hideModal('editBookModal');
+async function handleEditBook(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    const bookId = document.getElementById('editBookId').value;
+
+    // Gather form data
+    const bookData = {
+        title: document.getElementById('editBookTitle').value,
+        author_name: document.getElementById('editBookAuthor').value,
+        publication_year: document.getElementById('editBookPublicationDate').value,
+        genre: document.getElementById('editBookGenre').value,
+        available_copies: parseInt(document.getElementById('editBookAvailableCopies').value, 10),
+    };
+
+    try {
+        // Send data to the backend
+        const response = await fetch(`http://localhost:3000/api/books/${bookId}`, {
+            method: 'PUT', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bookData),
+        });
+
+        if (response.ok) {
+            const updatedBook = await response.json();
+            console.log('Book edited successfully:', updatedBook);
+            // Optionally refresh the book list
+            fetchBooks();
+            hideModal('editBookModal');
+        } else {
+            console.error('Failed to edit book:', bookId);
+            alert('Failed to edit book. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error editing book:', error);
+        alert('An error occurred while editing the book. Please try again.');
     }
 }
 
@@ -305,14 +321,14 @@ function editMember(id) {
 }
 
 function editBook(id) {
-    const book = books.find(book => book.id === id);
+    const book = booksList.find(book => book.book_id === id);
     if (book) {
-        document.getElementById('editBookId').value = book.id;
+        document.getElementById('editBookId').value = book.book_id;
         document.getElementById('editBookTitle').value = book.title;
-        document.getElementById('editBookAuthor').value = book.author;
+        document.getElementById('editBookAuthor').value = book.author_name;
         document.getElementById('editBookGenre').value = book.genre;
-        document.getElementById('editBookPublicationDate').value = book.publicationDate;
-        document.getElementById('editBookAvailableCopies').value = book.availableCopies;
+        document.getElementById('editBookPublicationDate').value = book.publication_year;
+        document.getElementById('editBookAvailableCopies').value = book.available_copies;
         showModal('editBookModal');
     }
 }
@@ -329,22 +345,23 @@ function searchMembers() {
 // display updates
 function updateDisplays() {
     updateBookDisplay();
-    updateMemberDisplay();
-    updateLoanDisplay();
-    updateLibrarianDisplay();
+    // updateMemberDisplay();
+    // updateLoanDisplay();
+    // updateLibrarianDisplay();
 }
 
-function updateBookDisplay(booksToShow = books) {
-    const bookList = document.querySelector('.book-list');
-    if (!bookList) return;
-    
-    bookList.innerHTML = booksToShow.map(book => `
+async function updateBookDisplay() {
+    const bookListElement = document.querySelector('.books-list');
+    if (!bookListElement) return;
+
+    bookListElement.innerHTML = booksList.map(book => `
         <div class="list-item">
             <div>
                 <h3>${book.title}</h3>
                 <p>Author: ${book.author_name}</p>
                 <p>Genre: ${book.genre}</p>
                 <p>Available Copies: ${book.available_copies}</p>
+                <p>Book ID: ${book.book_id}</p>
             </div>
             <div>
                 <button class="btn" onclick="editBook(${book.book_id})">Edit</button>
@@ -354,20 +371,20 @@ function updateBookDisplay(booksToShow = books) {
     `).join('');
 }
 
-function updateMemberDisplay(membersToShow = members) {
-    const memberList = document.querySelector('.member-list');
-    if (!memberList) return;
+function updateMemberDisplay() {
+    const memberListElement = document.querySelector('.member-list');
+    if (!memberListElement) return;
     
-    memberList.innerHTML = membersToShow.map(member => `
+    memberListElement.innerHTML = membersList.map(member => `
         <div class="list-item">
             <div>
-                <h3>${member.firstName} ${member.lastName}</h3>
+                <h3>${member.first_name} ${member.last_name}</h3>
                 <p>Email: ${member.email}</p>
-                <p>Phone: ${member.phone}</p>
+                <p>Phone: ${member.phone_number}</p>
             </div>
             <div>
-                <button class="btn" onclick="editMember(${member.id})">Edit</button>
-                <button class="btn btn-cancel" onclick="deleteMember(${member.id})">Delete</button>
+                <button class="btn" onclick="editMember(${member.member_id})">Edit</button>
+                <button class="btn btn-cancel" onclick="deleteMember(${member.member_id})">Delete</button>
             </div>
         </div>
     `).join('');
@@ -449,10 +466,32 @@ function hideEditMemberForm() {
     hideModal('editMemberModal');
 }
 
-function deleteBook(id) {
+async function deleteBook(id) {
     if (confirm('Are you sure you want to delete this book?')) {
-        books = books.filter(book => book.id !== id);
-        updateBookDisplay();
+        try {
+            // Send DELETE request to the backend API
+            const response = await fetch(`http://localhost:3000/api/books/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // Remove the book from the local `booksList`
+                booksList = booksList.filter(book => book.id !== id);
+
+                // Update the display after deletion
+                fetchBooks();
+
+                alert('Book successfully deleted.');
+            } else if (response.status === 404) {
+                alert('Book not found.');
+            } else {
+                console.error('Failed to delete book:', response.statusText);
+                alert('An error occurred while deleting the book.');
+            }
+        } catch (error) {
+            console.error('Error deleting book:', error);
+            alert('Could not delete the book. Please try again.');
+        }
     }
 }
 
@@ -486,151 +525,3 @@ function returnLoan(id) {
         updateLoanDisplay();
     }
 }
-
-
-
-
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     // Get the container element where books will be displayed
-//     const booksList = document.getElementById('books-list');
-  
-//     // Fetch books from the backend API
-//     async function fetchBooks() {
-//       try {
-//         const response = await fetch('http://localhost:3000/api/books');
-//         if (response.ok) {
-//           const books = await response.json();
-          
-//           // Clear the list before adding new books
-//           booksList.innerHTML = '';
-          
-//           // Iterate through the books and create list items for each
-//           books.forEach(book => {
-//             const listItem = document.createElement('li');
-//             listItem.classList.add('book-item');
-            
-//             // Format the publication year to a more readable format
-//             const formattedDate = new Date(book.publication_year).toLocaleDateString();
-  
-//             // Add the book details to the list item
-//             listItem.innerHTML = `
-//               <strong>Title:</strong> ${book.title} <br>
-//               <strong>Author:</strong> ${book.author_name} <br>
-//               <strong>Publication Year:</strong> ${formattedDate} <br>
-//               <strong>Genre:</strong> ${book.genre} <br>
-//               <strong>Available Copies:</strong> ${book.available_copies}
-//             `;
-            
-//             // Append the list item to the books list
-//             booksList.appendChild(listItem);
-//           });
-//         } else {
-//           console.error('Failed to fetch books:', response.statusText);
-//         }
-//       } catch (error) {
-//         console.error('Error fetching books:', error);
-//       }
-//     }
-
-//     fetchBooks();
-
-//     // Search for a book by ID
-//   async function searchBooks() {
-//     const bookId = bookSearch.value.trim();
-//     if (!bookId) {
-//       alert('Please enter a book ID to search.');
-//       return;
-//     }
-
-//     try {
-//       const response = await fetch(`http://localhost:3000/api/books/${bookId}`);
-//       if (response.ok) {
-//         const book = await response.json();
-
-//         // Clear the list before displaying the searched book
-//         booksList.innerHTML = '';
-
-//         // Format the publication year to a more readable format
-//         const formattedDate = new Date(book.publication_year).toLocaleDateString();
-
-//         // Create a list item for the book
-//         const listItem = document.createElement('li');
-//         listItem.classList.add('book-item');
-
-//         // Add the book details to the list item
-//         listItem.innerHTML = `
-//           <strong>Title:</strong> ${book.title} <br>
-//           <strong>Author:</strong> ${book.author_name} <br>
-//           <strong>Publication Year:</strong> ${formattedDate} <br>
-//           <strong>Genre:</strong> ${book.genre} <br>
-//           <strong>Available Copies:</strong> ${book.available_copies}
-//         `;
-
-//         // Append the list item to the books list
-//         booksList.appendChild(listItem);
-//       } else if (response.status === 404) {
-//         alert('Book not found.');
-//       } else {
-//         console.error('Failed to fetch book:', response.statusText);
-//       }
-//     } catch (error) {
-//       console.error('Error searching for book:', error);
-//     }
-//   }
-
-//   // Add the searchBooks function to the global scope for use in HTML
-//   window.searchBooks = searchBooks;
-
-//   document.getElementById("addBookButton").addEventListener("click", showAddBookForm);
-
-//   function showAddBookForm() {
-//       document.getElementById("addBookModal").style.display = "block";
-//   }
-  
-//   function closeAddBookForm() {
-//       document.getElementById("addBookModal").style.display = "none";
-//   }
-
-//   function addBook(event) {
-//     event.preventDefault(); // Prevent the form from reloading the page
-
-//     // Get form values
-//     const title = document.getElementById("bookTitle").value;
-//     const authorName = document.getElementById("authorName").value;
-//     const genre = document.getElementById("genre").value;
-//     const publishDate = document.getElementById("publishDate").value;
-//     const availableCopies = document.getElementById("availableCopies").value;
-
-//     // Prepare data for POST request
-//     const bookData = {
-//         title: title,
-//         author_name: authorName,
-//         publication_year: publishDate,
-//         genre: genre,
-//         available_copies: parseInt(availableCopies, 10)
-//     };
-
-//     // Make POST request
-//     fetch("http://localhost:3000/api/books", {  // Replace with your actual API URL
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify(bookData)
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         alert("Book added successfully!");
-//         closeAddBookForm();  // Close the modal after successful submission
-//         // Optionally, refresh the book list or update the UI
-//     })
-//     .catch(error => {
-//         console.error("Error adding book:", error);
-//         alert("Failed to add book.");
-//     });
-// }
-
-//     // Call the fetchBooks function to populate the list when the page loads
-//     fetchBooks();
-//   });

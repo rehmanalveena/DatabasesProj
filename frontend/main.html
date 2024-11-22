@@ -32,9 +32,12 @@
              <!DOCTYPE html>
             <body>
             <h1>Available Books</h1>
-            <ul id="books-list">
-                <!-- The list of books will be populated here -->
+            <ul id="books-list"> 
+                 
             </ul>
+            <div class="books-list">
+                <!-- The list of books will be populated here by JavaScript -->
+            </div>
             <script src="script.js"></script>
             </body>
             </html>
@@ -50,6 +53,25 @@
                         <input type="number" id="availableCopies" placeholder="Available Copies" required>
                         <button type="submit" class="btn btn-submit">Save</button>
                         <button type="submit" class="btn btn-cancel" onclick="hideAddBookForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- edit form -->
+            <div id="editBookModal" class="modal">
+                <div class="modal-content">
+                    <h3>Edit Book</h3>
+                    <form id="editBookForm" onsubmit="handleEditBook(event)">
+                        <input type="hidden" id="editBookId" name="id">
+                        <input type="text" id="editBookTitle" name="title" placeholder="Title" required>
+                        <input type="text" id="editBookAuthor" name="author" placeholder="Author" required>
+                        <input type="text" id="editBookGenre" name="genre" placeholder="Genre" required>
+                        <input type="date" id="editBookPublicationDate" name="publicationDate" placeholder="Publication Date"> 
+                        <input type="number" id="editBookAvailableCopies" name="availableCopies" placeholder="Available Copies" required>
+                        <div class="modal-buttons">
+                            <button type="submit" class="btn">Save Changes</button>
+                            <button type="button" class="btn btn-cancel" onclick="hideEditBookForm()">Cancel</button>
+                        </div>
                     </form>
                 </div>
             </div>
